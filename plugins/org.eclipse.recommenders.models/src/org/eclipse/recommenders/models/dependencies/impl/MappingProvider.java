@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
-import org.eclipse.recommenders.models.dependencies.IDependencyInfo;
+import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.IMappingProvider;
 import org.eclipse.recommenders.models.dependencies.IMappingStrategy;
 import org.eclipse.recommenders.utils.annotations.Testing;
@@ -25,21 +25,20 @@ import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheStats;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 
 public class MappingProvider implements IMappingProvider {
 
     List<IMappingStrategy> strategies = Lists.newArrayList();
-    private LoadingCache<IDependencyInfo, Optional<ProjectCoordinate>> cache;
+    private LoadingCache<DependencyInfo, Optional<ProjectCoordinate>> cache;
 
     public MappingProvider() {
         cache = CacheBuilder.newBuilder()
                 .maximumSize(200)
-                .build(new CacheLoader<IDependencyInfo, Optional<ProjectCoordinate>>() {
+                .build(new CacheLoader<DependencyInfo, Optional<ProjectCoordinate>>() {
 
                     @Override
-                    public Optional<ProjectCoordinate> load(IDependencyInfo key) throws Exception {
+                    public Optional<ProjectCoordinate> load(DependencyInfo key) throws Exception {
 
                         return extractProjectCoordinate(key);
                     }
@@ -62,7 +61,7 @@ public class MappingProvider implements IMappingProvider {
     }
 
     @Override
-    public Optional<ProjectCoordinate> searchForProjectCoordinate(IDependencyInfo dependencyInfo) {
+    public Optional<ProjectCoordinate> searchForProjectCoordinate(DependencyInfo dependencyInfo) {
         try {
             return cache.get(dependencyInfo);
         } catch (Exception e) {
@@ -70,7 +69,7 @@ public class MappingProvider implements IMappingProvider {
         }
     }
 
-    private Optional<ProjectCoordinate> extractProjectCoordinate(IDependencyInfo dependencyInfo) {
+    private Optional<ProjectCoordinate> extractProjectCoordinate(DependencyInfo dependencyInfo) {
         for (IMappingStrategy strategy : strategies) {
             Optional<ProjectCoordinate> optionalProjectCoordinate = strategy.searchForProjectCoordinate(dependencyInfo);
             if (optionalProjectCoordinate.isPresent()) {

@@ -18,7 +18,7 @@ import org.eclipse.recommenders.utils.Checks;
 
 import com.google.common.base.Optional;
 
-public class DependencyInfo implements IDependencyInfo {
+public class DependencyInfo {
 
     public static final String JRE_VERSION_IDE = "JRE_VERSION_IDE";
 
@@ -36,17 +36,14 @@ public class DependencyInfo implements IDependencyInfo {
         this.attributes = Checks.ensureIsNotNull(attributes);
     }
 
-    @Override
     public File getFile() {
         return file;
     }
 
-    @Override
     public DependencyType getType() {
         return type;
     }
 
-    @Override
     public Optional<String> getAttribute(String key) {
         return Optional.fromNullable(attributes.get(key));
     }

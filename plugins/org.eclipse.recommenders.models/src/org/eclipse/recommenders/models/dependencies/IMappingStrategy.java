@@ -19,7 +19,7 @@ import com.google.common.base.Optional;
  */
 public interface IMappingStrategy {
 
-    public Optional<ProjectCoordinate> searchForProjectCoordinate(IDependencyInfo dependencyInfo);
+    public Optional<ProjectCoordinate> searchForProjectCoordinate(DependencyInfo dependencyInfo);
 
     public boolean isApplicable(DependencyType dependencyType);
 

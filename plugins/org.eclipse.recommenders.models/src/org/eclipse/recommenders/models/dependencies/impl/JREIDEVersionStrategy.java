@@ -16,14 +16,14 @@ import static com.google.common.base.Optional.fromNullable;
 import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
-import org.eclipse.recommenders.models.dependencies.IDependencyInfo;
+import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 
 import com.google.common.base.Optional;
 
 public class JREIDEVersionStrategy extends AbstractStrategy {
 
     @Override
-    protected Optional<ProjectCoordinate> extractProjectCoordinateInternal(IDependencyInfo dependencyInfo) {
+    protected Optional<ProjectCoordinate> extractProjectCoordinateInternal(DependencyInfo dependencyInfo) {
         Optional<String> optionalVersion = dependencyInfo.getAttribute(DependencyInfo.JRE_VERSION_IDE);
         if (!optionalVersion.isPresent()) {
             return absent();

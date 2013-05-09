@@ -25,6 +25,6 @@ Import-Package: com.google.common.base;version="10.0.1",
  org.eclipse.recommenders.utils.archive,
  org.eclipse.recommenders.utils.gson,
  org.eclipse.recommenders.utils.names,
- org.slf4j;version="1.7.2",
  org.sonatype.aether.util.artifact
 Bundle-ActivationPolicy: lazy
+Require-Bundle: com.google.guava;bundle-version="10.0.1"

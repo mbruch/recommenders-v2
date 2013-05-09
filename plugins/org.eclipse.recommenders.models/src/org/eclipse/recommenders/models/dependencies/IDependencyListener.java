@@ -10,19 +10,10 @@
  */
 package org.eclipse.recommenders.models.dependencies;
 
-import java.io.File;
+import java.util.Set;
 
-import com.google.common.base.Optional;
+public interface IDependencyListener {
 
-/**
- * Represent an element in the workspace containing the corresponding file, type and other attributes.
- */
-public interface IDependencyInfo {
-
-    public File getFile();
-
-    public DependencyType getType();
-
-    public Optional<String> getAttribute(String key);
+    public Set<DependencyInfo> getDependencies();
 
 }

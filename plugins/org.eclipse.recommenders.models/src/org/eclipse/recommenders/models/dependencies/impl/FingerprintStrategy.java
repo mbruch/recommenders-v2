@@ -15,7 +15,7 @@ import static com.google.common.base.Optional.fromNullable;
 
 import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
-import org.eclipse.recommenders.models.dependencies.IDependencyInfo;
+import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.utils.Fingerprints;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
@@ -23,9 +23,10 @@ import com.google.common.base.Optional;
 
 public class FingerprintStrategy extends AbstractStrategy {
 
-    private final IndexUtilities indexer;
 
-    public FingerprintStrategy(IndexUtilities indexer) {
+    private final SimpleIndexSearcher indexer;
+
+    public FingerprintStrategy(SimpleIndexSearcher indexer) {
         this.indexer = indexer;
     }
 
@@ -35,26 +36,26 @@ public class FingerprintStrategy extends AbstractStrategy {
     }
 
     @Override
-    protected Optional<ProjectCoordinate> extractProjectCoordinateInternal(IDependencyInfo dependencyInfo) {
+    protected Optional<ProjectCoordinate> extractProjectCoordinateInternal(DependencyInfo dependencyInfo) {
         String fingerprint = Fingerprints.sha1(dependencyInfo.getFile());
         indexer.open();
         Optional<String> optionalCoordinateString = indexer.searchByFingerprint(fingerprint);
         indexer.close();
-        if (!optionalCoordinateString.isPresent()) {
-            return absent();
-        }
-        return extractProjectCoordinate(optionalCoordinateString.get());
+        return extractProjectCoordinate(optionalCoordinateString);
     }
 
-    private Optional<ProjectCoordinate> extractProjectCoordinate(String string) {
+    private Optional<ProjectCoordinate> extractProjectCoordinate(Optional<String> optionalCoordinateString) {
+        if (!optionalCoordinateString.isPresent()){
+            return absent();
+        }        
         try {
-            DefaultArtifact artifact = new DefaultArtifact(string);
-            return fromNullable(new ProjectCoordinate(artifact.getGroupId(),
-                    artifact.getArtifactId(),
+            DefaultArtifact artifact = new DefaultArtifact(optionalCoordinateString.get());
+            return fromNullable(new ProjectCoordinate(artifact.getGroupId(), artifact.getArtifactId(),
                     artifact.getVersion()));
         } catch (IllegalArgumentException e) {
             return absent();
         }
     }
+
 
 }

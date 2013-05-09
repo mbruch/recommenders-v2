@@ -39,14 +39,14 @@ import com.google.common.base.Optional;
 /**
  * Lighter version of ModelRepositoryIndex in *.recommendrs.rcp
  */
-public class IndexUtilities implements Closeable {
+public class SimpleIndexSearcher implements Closeable {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
     private Directory directory;
     private IndexReader reader;
     private final File location;
 
-    public IndexUtilities(File location) {
+    public SimpleIndexSearcher(File location) {
         this.location = location;
     }
 

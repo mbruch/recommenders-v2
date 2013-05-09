@@ -13,7 +13,7 @@ package org.eclipse.recommenders.models.dependencies.impl;
 import static com.google.common.base.Optional.absent;
 
 import org.eclipse.recommenders.models.ProjectCoordinate;
-import org.eclipse.recommenders.models.dependencies.IDependencyInfo;
+import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.IMappingStrategy;
 
 import com.google.common.base.Optional;
@@ -21,13 +21,13 @@ import com.google.common.base.Optional;
 public abstract class AbstractStrategy implements IMappingStrategy {
 
     @Override
-    public Optional<ProjectCoordinate> searchForProjectCoordinate(IDependencyInfo dependencyInfo) {
+    public Optional<ProjectCoordinate> searchForProjectCoordinate(DependencyInfo dependencyInfo) {
         if (!isApplicable(dependencyInfo.getType())) {
             return absent();
         }
         return extractProjectCoordinateInternal(dependencyInfo);
     }
 
-    protected abstract Optional<ProjectCoordinate> extractProjectCoordinateInternal(IDependencyInfo dependencyInfo);
+    protected abstract Optional<ProjectCoordinate> extractProjectCoordinateInternal(DependencyInfo dependencyInfo);
 
 }
