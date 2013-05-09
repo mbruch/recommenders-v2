@@ -1,0 +1,3309 @@
+From e992c947ef026917e353633ab1881724dafe91fe Mon Sep 17 00:00:00 2001
+From: Marcel Bruch <marcel.bruch@codetrails.com>
+Date: Mon, 7 Jan 2013 17:40:33 +0100
+Subject: [PATCH] [models, draft] new, UI independent models API.
+
+Any comments and any API proposals are welcome - best with an example
+API usage snippet.
+
+Change-Id: I97428593b5028818d03e6b35b7dad048f33ff2ef
+---
+ plugins/org.eclipse.recommenders.models/.classpath |   8 +
+ plugins/org.eclipse.recommenders.models/.project   |  28 +++
+ .../.settings/org.eclipse.jdt.core.prefs           |   7 +
+ .../.settings/org.eclipse.pde.core.prefs           |   2 +
+ .../META-INF/MANIFEST.MF                           |  24 +++
+ plugins/org.eclipse.recommenders.models/about.html |  28 +++
+ .../build.properties                               |   6 +
+ .../doc/examples/CallsDemoModelProvider.java       |  30 +++
+ .../doc/examples/CompletionEngineExample.java      |  70 +++++++
+ .../examples/EclipseProjectCoordinateProvider.java |  19 ++
+ .../doc/examples/MappingWorkFlowExample.java       |  38 ++++
+ .../doc/examples/UsingModelArchiveCache.java       |  74 +++++++
+ .../doc/examples/UsingModelProvider.java           |  32 +++
+ plugins/org.eclipse.recommenders.models/pom.xml    |  21 ++
+ .../eclipse/recommenders/models/IBasedName.java    |  23 +++
+ .../recommenders/models/IModelProvider.java        |  34 +++
+ .../models/IProjectCoordinateProvider.java         |  24 +++
+ .../recommenders/models/ProjectCoordinate.java     |  73 +++++++
+ .../models/ProjectCoordinateProviders.java         | 104 ++++++++++
+ .../models/archives/AbstractModelProvider.java     | 183 ++++++++++++++++
+ .../models/archives/IModelArchive.java             |  71 +++++++
+ .../archives/IModelArchiveCoordinateProvider.java  |  62 ++++++
+ .../models/archives/ModelArchiveCache.java         |  84 ++++++++
+ .../models/archives/ModelArchiveCacheEvents.java   |  78 +++++++
+ .../models/archives/ModelArchiveCoordinate.java    |  99 +++++++++
+ .../models/mapping/DependencyType.java             |  18 ++
+ .../models/mapping/IDependencyInfo.java            |  28 +++
+ .../models/mapping/IMappingProvider.java           |  29 +++
+ .../models/mapping/IMappingStrategy.java           |  26 +++
+ .../models/mapping/impl/AbstractStrategy.java      |  33 +++
+ .../models/mapping/impl/DependencyInfo.java        |  90 ++++++++
+ .../models/mapping/impl/FingerprintStrategy.java   |  59 ++++++
+ .../models/mapping/impl/IndexUtilities.java        | 107 ++++++++++
+ .../models/mapping/impl/JREIDEVersionStrategy.java |  41 ++++
+ .../mapping/impl/JREReleaseFileStrategy.java       |  78 +++++++
+ .../models/mapping/impl/MappingProvider.java       | 109 ++++++++++
+ .../mapping/impl/MavenPomPropertiesStrategy.java   | 188 +++++++++++++++++
+ plugins/pom.xml                                    |   3 +-
+ .../.classpath                                     |   7 +
+ .../org.eclipse.recommenders.tests.models/.project |  34 +++
+ .../.settings/org.eclipse.core.resources.prefs     |   2 +
+ .../.settings/org.eclipse.jdt.core.prefs           |   7 +
+ .../.settings/org.eclipse.m2e.core.prefs           |   4 +
+ .../META-INF/MANIFEST.MF                           |  12 ++
+ .../build.properties                               |   4 +
+ .../org.eclipse.recommenders.tests.models/pom.xml  |  12 ++
+ .../tests/models/FingerprintStrategyTest.java      |  76 +++++++
+ .../models/IFileToJarFileConverterMockBuilder.java |  68 ++++++
+ .../tests/models/JREIDEVersionStrategyTest.java    |  70 +++++++
+ .../tests/models/JREReleaseFileStrategyTest.java   | 116 +++++++++++
+ .../tests/models/MappingProviderTest.java          | 166 +++++++++++++++
+ .../models/MavenPomPropertiesStrategyTest.java     | 230 +++++++++++++++++++++
+ .../META-INF/MANIFEST.MF                           |   3 +-
+ tests/pom.xml                                      |   1 +
+ 54 files changed, 2841 insertions(+), 2 deletions(-)
+ create mode 100644 plugins/org.eclipse.recommenders.models/.classpath
+ create mode 100644 plugins/org.eclipse.recommenders.models/.project
+ create mode 100644 plugins/org.eclipse.recommenders.models/.settings/org.eclipse.jdt.core.prefs
+ create mode 100644 plugins/org.eclipse.recommenders.models/.settings/org.eclipse.pde.core.prefs
+ create mode 100644 plugins/org.eclipse.recommenders.models/META-INF/MANIFEST.MF
+ create mode 100644 plugins/org.eclipse.recommenders.models/about.html
+ create mode 100644 plugins/org.eclipse.recommenders.models/build.properties
+ create mode 100644 plugins/org.eclipse.recommenders.models/doc/examples/CallsDemoModelProvider.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/doc/examples/CompletionEngineExample.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/doc/examples/EclipseProjectCoordinateProvider.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/doc/examples/MappingWorkFlowExample.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/doc/examples/UsingModelArchiveCache.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/doc/examples/UsingModelProvider.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/pom.xml
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/IBasedName.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/IModelProvider.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/IProjectCoordinateProvider.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/ProjectCoordinate.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/ProjectCoordinateProviders.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/AbstractModelProvider.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/IModelArchive.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/IModelArchiveCoordinateProvider.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/ModelArchiveCache.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/ModelArchiveCacheEvents.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/ModelArchiveCoordinate.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/DependencyType.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/IDependencyInfo.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/IMappingProvider.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/IMappingStrategy.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/AbstractStrategy.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/DependencyInfo.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/FingerprintStrategy.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/IndexUtilities.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/JREIDEVersionStrategy.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/JREReleaseFileStrategy.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/MappingProvider.java
+ create mode 100644 plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/MavenPomPropertiesStrategy.java
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/.classpath
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/.project
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/.settings/org.eclipse.core.resources.prefs
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/.settings/org.eclipse.jdt.core.prefs
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/.settings/org.eclipse.m2e.core.prefs
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/META-INF/MANIFEST.MF
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/build.properties
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/pom.xml
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/FingerprintStrategyTest.java
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/IFileToJarFileConverterMockBuilder.java
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/JREIDEVersionStrategyTest.java
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/JREReleaseFileStrategyTest.java
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/MappingProviderTest.java
+ create mode 100644 tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/MavenPomPropertiesStrategyTest.java
+
+diff --git a/plugins/org.eclipse.recommenders.models/.classpath b/plugins/org.eclipse.recommenders.models/.classpath
+new file mode 100644
+index 0000000..96ab11f
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/.classpath
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<classpath>
++	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
++	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
++	<classpathentry kind="src" path="src"/>
++	<classpathentry kind="src" path="doc"/>
++	<classpathentry kind="output" path="bin"/>
++</classpath>
+diff --git a/plugins/org.eclipse.recommenders.models/.project b/plugins/org.eclipse.recommenders.models/.project
+new file mode 100644
+index 0000000..77ebd38
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/.project
+@@ -0,0 +1,28 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<projectDescription>
++	<name>org.eclipse.recommenders.models</name>
++	<comment></comment>
++	<projects>
++	</projects>
++	<buildSpec>
++		<buildCommand>
++			<name>org.eclipse.jdt.core.javabuilder</name>
++			<arguments>
++			</arguments>
++		</buildCommand>
++		<buildCommand>
++			<name>org.eclipse.pde.ManifestBuilder</name>
++			<arguments>
++			</arguments>
++		</buildCommand>
++		<buildCommand>
++			<name>org.eclipse.pde.SchemaBuilder</name>
++			<arguments>
++			</arguments>
++		</buildCommand>
++	</buildSpec>
++	<natures>
++		<nature>org.eclipse.pde.PluginNature</nature>
++		<nature>org.eclipse.jdt.core.javanature</nature>
++	</natures>
++</projectDescription>
+diff --git a/plugins/org.eclipse.recommenders.models/.settings/org.eclipse.jdt.core.prefs b/plugins/org.eclipse.recommenders.models/.settings/org.eclipse.jdt.core.prefs
+new file mode 100644
+index 0000000..c537b63
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/.settings/org.eclipse.jdt.core.prefs
+@@ -0,0 +1,7 @@
++eclipse.preferences.version=1
++org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled
++org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6
++org.eclipse.jdt.core.compiler.compliance=1.6
++org.eclipse.jdt.core.compiler.problem.assertIdentifier=error
++org.eclipse.jdt.core.compiler.problem.enumIdentifier=error
++org.eclipse.jdt.core.compiler.source=1.6
+diff --git a/plugins/org.eclipse.recommenders.models/.settings/org.eclipse.pde.core.prefs b/plugins/org.eclipse.recommenders.models/.settings/org.eclipse.pde.core.prefs
+new file mode 100644
+index 0000000..923c37f
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/.settings/org.eclipse.pde.core.prefs
+@@ -0,0 +1,2 @@
++eclipse.preferences.version=1
++resolve.requirebundle=false
+diff --git a/plugins/org.eclipse.recommenders.models/META-INF/MANIFEST.MF b/plugins/org.eclipse.recommenders.models/META-INF/MANIFEST.MF
+new file mode 100644
+index 0000000..6a46bf1
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/META-INF/MANIFEST.MF
+@@ -0,0 +1,24 @@
++Manifest-Version: 1.0
++Bundle-ManifestVersion: 2
++Bundle-Name: Models
++Bundle-SymbolicName: org.eclipse.recommenders.models;singleton:=true
++Bundle-Version: 0.0.0.qualifier
++Bundle-RequiredExecutionEnvironment: JavaSE-1.6
++Export-Package: org.eclipse.recommenders.models,
++ org.eclipse.recommenders.models.archives
++Import-Package: com.google.common.base;version="[10.0.0,11.0.0)",
++ com.google.common.collect;version="[10.0.0,11.0.0)",
++ com.google.common.eventbus;version="[10.0.0,11.0.0)",
++ javax.inject;version="1.0.0",
++ org.apache.commons.lang3.builder;version="[3.0.0,4.0.0)",
++ org.apache.commons.lang3.tuple;version="[3.0.0,4.0.0)",
++ org.apache.commons.pool;version="[1.6.0,2.0.0)",
++ org.apache.commons.pool.impl;version="[1.6.0,2.0.0)",
++ org.slf4j;version="[1.6.0,2.0.0)"
++Require-Bundle: org.eclipse.core.runtime,
++ org.eclipse.recommenders.utils,
++ com.google.guava;bundle-version="10.0.1",
++ org.eclipse.recommenders.rcp;bundle-version="1.0.3",
++ org.apache.lucene;bundle-version="3.5.0",
++ com.google.gson;bundle-version="2.1.0",
++ org.apache.commons.io;bundle-version="2.0.1"
+diff --git a/plugins/org.eclipse.recommenders.models/about.html b/plugins/org.eclipse.recommenders.models/about.html
+new file mode 100644
+index 0000000..c258ef5
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/about.html
+@@ -0,0 +1,28 @@
++<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
++    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
++<html xmlns="http://www.w3.org/1999/xhtml">
++<head>
++<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
++<title>About</title>
++</head>
++<body lang="EN-US">
++<h2>About This Content</h2>
++ 
++<p>June 5, 2006</p>	
++<h3>License</h3>
++
++<p>The Eclipse Foundation makes available all content in this plug-in (&quot;Content&quot;).  Unless otherwise 
++indicated below, the Content is provided to you under the terms and conditions of the
++Eclipse Public License Version 1.0 (&quot;EPL&quot;).  A copy of the EPL is available 
++at <a href="http://www.eclipse.org/legal/epl-v10.html">http://www.eclipse.org/legal/epl-v10.html</a>.
++For purposes of the EPL, &quot;Program&quot; will mean the Content.</p>
++
++<p>If you did not receive this Content directly from the Eclipse Foundation, the Content is 
++being redistributed by another party (&quot;Redistributor&quot;) and different terms and conditions may
++apply to your use of any object code in the Content.  Check the Redistributor's license that was 
++provided with the Content.  If no such license exists, contact the Redistributor.  Unless otherwise
++indicated below, the terms and conditions of the EPL still apply to any source code in the Content
++and such source code may be obtained at <a href="http://www.eclipse.org/">http://www.eclipse.org</a>.</p>
++
++</body>
++</html>
+\ No newline at end of file
+diff --git a/plugins/org.eclipse.recommenders.models/build.properties b/plugins/org.eclipse.recommenders.models/build.properties
+new file mode 100644
+index 0000000..5c4eff4
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/build.properties
+@@ -0,0 +1,6 @@
++source.. = src/,\
++           doc/
++output.. = bin/
++bin.includes = META-INF/,\
++               .
++src.excludes = doc/
+diff --git a/plugins/org.eclipse.recommenders.models/doc/examples/CallsDemoModelProvider.java b/plugins/org.eclipse.recommenders.models/doc/examples/CallsDemoModelProvider.java
+new file mode 100644
+index 0000000..d01036b
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/doc/examples/CallsDemoModelProvider.java
+@@ -0,0 +1,30 @@
++package examples;
++
++import java.io.IOException;
++import java.io.InputStream;
++import java.util.zip.ZipEntry;
++import java.util.zip.ZipFile;
++
++import org.eclipse.recommenders.models.IBasedName;
++import org.eclipse.recommenders.models.archives.AbstractModelProvider;
++import org.eclipse.recommenders.models.archives.IModelArchiveCoordinateProvider;
++import org.eclipse.recommenders.models.archives.ModelArchiveCoordinate;
++import org.eclipse.recommenders.utils.Zips;
++import org.eclipse.recommenders.utils.names.ITypeName;
++
++public class CallsDemoModelProvider extends AbstractModelProvider<IBasedName<ITypeName>, Object> {
++
++    public CallsDemoModelProvider(IModelArchiveCoordinateProvider modelIdProvider) {
++        super(modelIdProvider);
++    }
++
++    @Override
++    protected Object createModel(IBasedName<ITypeName> key, ZipFile modelArchive, ModelArchiveCoordinate modelId) throws IOException {
++        String path = Zips.path(key.getName(), ".net");
++        ZipEntry entry = new ZipEntry(path);
++        InputStream s = modelArchive.getInputStream(entry);
++        Object model = null; // ... do things with s to create a model
++        s.close();
++        return model;
++    }
++}
+diff --git a/plugins/org.eclipse.recommenders.models/doc/examples/CompletionEngineExample.java b/plugins/org.eclipse.recommenders.models/doc/examples/CompletionEngineExample.java
+new file mode 100644
+index 0000000..e30eae4
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/doc/examples/CompletionEngineExample.java
+@@ -0,0 +1,70 @@
++package examples;
++
++import java.io.File;
++
++import org.eclipse.recommenders.models.IBasedName;
++import org.eclipse.recommenders.models.IModelProvider;
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.utils.names.ITypeName;
++
++import com.google.common.base.Optional;
++
++import examples.UsingModelProvider.RecommendationModel;
++
++public class CompletionEngineExample {
++
++    void resolveGavFromPackgeFragmentRoot(IPackageFragementRoot jdtElement, EclipseProjectCoordinateProvider r) {
++        if (jdtElement.isjar()) {
++            // ignore what type jdtElement is exactly!
++        } else if (jdtElement.isSourceFolder()) {
++            // src folders are mapped by the mapping service internally.
++        }
++        Optional<ProjectCoordinate> gav = r.map(jdtElement);
++    }
++
++    void resolveGavFromIJavaElement(IJavaElement jdtElement, EclipseProjectCoordinateProvider r) {
++        // same for jar, src folder, package etc.:
++        Optional<ProjectCoordinate> gav = r.map(jdtElement);
++    }
++
++    void resolveGavFromSourceFolder(IPackageFragementRoot srcFolder, EclipseProjectCoordinateProvider r) {
++    }
++
++    private static final class CompletionEngine {
++        IModelProvider<IBasedName<ITypeName>, RecommendationModel> modelProvider;
++        EclipseProjectCoordinateProvider coordService;
++
++        void computeProposals(IJavaElement e) {
++            ProjectCoordinate gav = coordService.map(e).orNull();
++            ITypeName type = e.getITypeName(); // convert somehow to ITypeName
++            IBasedName<ITypeName> name = createQualifiedName(gav, type);
++            RecommendationModel net = modelProvider.acquireModel(name).orNull();
++            // ... do work
++            modelProvider.releaseModel(net);
++
++        }
++
++        private IBasedName<ITypeName> createQualifiedName(ProjectCoordinate gav, ITypeName name) {
++            return null;
++        }
++    }
++
++    interface IJavaElement {
++
++        ITypeName getITypeName();
++    }
++
++    interface IPackageFragementRoot extends IJavaElement {
++
++        // it's slightly more complicated but...
++        File getFile();
++
++        boolean isjar();
++
++        boolean isSourceFolder();
++    }
++
++    interface IJavaProject {
++    }
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/doc/examples/EclipseProjectCoordinateProvider.java b/plugins/org.eclipse.recommenders.models/doc/examples/EclipseProjectCoordinateProvider.java
+new file mode 100644
+index 0000000..2ff6a55
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/doc/examples/EclipseProjectCoordinateProvider.java
+@@ -0,0 +1,19 @@
++package examples;
++
++import static org.eclipse.recommenders.utils.Throws.throwNotImplemented;
++
++import org.eclipse.recommenders.models.IProjectCoordinateProvider;
++import org.eclipse.recommenders.models.ProjectCoordinate;
++
++import com.google.common.base.Optional;
++
++import examples.CompletionEngineExample.IJavaElement;
++
++public class EclipseProjectCoordinateProvider implements IProjectCoordinateProvider {
++
++    public Optional<ProjectCoordinate> map(IJavaElement jdtElement) {
++        // TODO Auto-generated method stub
++        throw throwNotImplemented();
++    }
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/doc/examples/MappingWorkFlowExample.java b/plugins/org.eclipse.recommenders.models/doc/examples/MappingWorkFlowExample.java
+new file mode 100644
+index 0000000..cb69ea1
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/doc/examples/MappingWorkFlowExample.java
+@@ -0,0 +1,38 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package examples;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.models.mapping.IDependencyInfo;
++import org.eclipse.recommenders.models.mapping.IMappingProvider;
++import org.eclipse.recommenders.models.mapping.IMappingStrategy;
++import org.eclipse.recommenders.models.mapping.impl.MavenPomPropertiesStrategy;
++
++import com.google.common.base.Optional;
++
++public class MappingWorkFlowExample {
++
++    public static void useOfMapping(IMappingProvider mapping) {
++        IDependencyInfo ed = null;
++
++        mapping.addStrategy(new MavenPomPropertiesStrategy());
++
++        IMappingStrategy mappingStrategy = mapping;
++
++        Optional<ProjectCoordinate> optionalProjectCoordinate = mappingStrategy.searchForProjectCoordinate(ed);
++
++        ProjectCoordinate projectCoordinate = null;
++        if (optionalProjectCoordinate.isPresent()) {
++            projectCoordinate = optionalProjectCoordinate.get();
++        }
++    }
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/doc/examples/UsingModelArchiveCache.java b/plugins/org.eclipse.recommenders.models/doc/examples/UsingModelArchiveCache.java
+new file mode 100644
+index 0000000..a071c51
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/doc/examples/UsingModelArchiveCache.java
+@@ -0,0 +1,74 @@
++package examples;
++
++import java.io.IOException;
++
++import org.apache.commons.lang3.tuple.Pair;
++import org.eclipse.core.runtime.IProgressMonitor;
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.models.archives.IModelArchiveCoordinateProvider;
++import org.eclipse.recommenders.models.archives.ModelArchiveCache;
++import org.eclipse.recommenders.models.archives.ModelArchiveCacheEvents;
++import org.eclipse.recommenders.models.archives.ModelArchiveCoordinate;
++
++import com.google.common.collect.HashBasedTable;
++import com.google.common.collect.Table;
++import com.google.common.eventbus.Subscribe;
++
++@SuppressWarnings("unused")
++public class UsingModelArchiveCache {
++
++    void downloadModelArchive(ModelArchiveCoordinate model, ModelArchiveCache repository) throws IOException {
++        repository.resolve(model, newMonitor());
++    }
++
++    void findLocalModelArchive(ModelArchiveCoordinate model, ModelArchiveCache repository) throws IOException {
++        if (!repository.getLocation(model).isPresent()) {
++            repository.resolve(model, newMonitor());
++        }
++    }
++
++    void deleteCachedModelArchive(ModelArchiveCoordinate model, ModelArchiveCache repository) throws IOException {
++        repository.delete(model, newMonitor());
++    }
++
++    void deleteIndex(ModelArchiveCache repository) throws IOException {
++        repository.delete(ModelArchiveCache.INDEX, newMonitor());
++    }
++
++    void findAllModelArtifacts(ProjectCoordinate[] gavs, ModelArchiveCache cache,
++            IModelArchiveCoordinateProvider[] modelProviders) {
++
++        Table<ProjectCoordinate, String, Pair<ModelArchiveCoordinate, Boolean>> mappings = HashBasedTable.create();
++        for (ProjectCoordinate projectCoord : gavs) {
++            for (IModelArchiveCoordinateProvider modelProvider : modelProviders) {
++                ModelArchiveCoordinate modelCoord = modelProvider.get(projectCoord).orNull();
++                if (modelCoord != null) {
++                    boolean cached = cache.isCached(modelCoord);
++                    mappings.put(projectCoord, modelProvider.getType(), Pair.of(modelCoord, cached));
++                }
++            }
++        }
++        // update ui...
++    }
++
++    @Subscribe
++    void onEvent(ModelArchiveCacheEvents.ModelArchiveCacheOpenedEvent e) {
++        // TODO check if a new index is available and download it
++
++    }
++
++    @Subscribe
++    void onEvent(ModelArchiveCacheEvents.ModelArchiveCacheClosedEvent e) {
++        // TODO persists what needs to be persisted
++    }
++
++    @Subscribe
++    void onEvent(ModelArchiveCacheEvents.ModelArchiveInstalledEvent e) {
++        // TODO delete old cached keys, and reload the models currently required
++    }
++
++    private IProgressMonitor newMonitor() {
++        // TODO Auto-generated method stub
++        return null;
++    }
++}
+diff --git a/plugins/org.eclipse.recommenders.models/doc/examples/UsingModelProvider.java b/plugins/org.eclipse.recommenders.models/doc/examples/UsingModelProvider.java
+new file mode 100644
+index 0000000..e561304
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/doc/examples/UsingModelProvider.java
+@@ -0,0 +1,32 @@
++package examples;
++
++import org.eclipse.recommenders.models.IBasedName;
++import org.eclipse.recommenders.models.IModelProvider;
++import org.eclipse.recommenders.utils.names.ITypeName;
++
++public class UsingModelProvider {
++
++    RecommendationModel DUMMY = new RecommendationModel();
++    IModelProvider<IBasedName<ITypeName>, RecommendationModel> service;
++
++    void getModelForIDEType(Object ideIType) {
++        IBasedName<ITypeName> name = convertToQualifiedTypeName(ideIType);
++        RecommendationModel model = service.acquireModel(name).or(DUMMY);
++        model.compute();
++        // ...
++        service.releaseModel(model);
++    }
++
++    private IBasedName<ITypeName> convertToQualifiedTypeName(Object ideIType) {
++        // TODO Auto-generated method stub
++        return null;
++    }
++
++    static class RecommendationModel {
++
++        public void compute() {
++            // TODO Auto-generated method stub
++
++        }
++    }
++}
+diff --git a/plugins/org.eclipse.recommenders.models/pom.xml b/plugins/org.eclipse.recommenders.models/pom.xml
+new file mode 100644
+index 0000000..0771c0e
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/pom.xml
+@@ -0,0 +1,21 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
++	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
++	<parent>
++		<groupId>org.eclipse.recommenders.plugin</groupId>
++		<artifactId>org.eclipse.recommenders.plugin.parent</artifactId>
++	        <version>1.0.3-SNAPSHOT</version>
++	</parent>
++	<modelVersion>4.0.0</modelVersion>
++	<artifactId>org.eclipse.recommenders.models</artifactId>
++	<version>0.0.0-SNAPSHOT</version>
++	<packaging>eclipse-plugin</packaging>
++	<build>
++		<plugins>
++			<plugin>
++				<groupId>org.apache.maven.plugins</groupId>
++				<artifactId>maven-enforcer-plugin</artifactId>
++			</plugin>
++		</plugins>
++	</build>
++</project>
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/IBasedName.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/IBasedName.java
+new file mode 100644
+index 0000000..fdf2441
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/IBasedName.java
+@@ -0,0 +1,23 @@
++package org.eclipse.recommenders.models;
++
++import org.eclipse.recommenders.utils.names.IName;
++
++/**
++ * An {@link IBasedName} is an identifier qualified with a {@link ProjectCoordinate}. The identifier type can be
++ * arbitrary but usually is a sub-type of {@link IName}, hence, the method to obtain the identifier is called
++ * {@link #getName()} instead of {@code getIdentifier()}.
++ */
++public interface IBasedName<T> {
++
++    /**
++     * Returns the relative part of this name which must not be <code>null</code>.
++     */
++    T getName();
++
++    /**
++     * Returns the base, i.e., the project coordinate, of this name. The coordinate may default to
++     * {@link ProjectCoordinate#UNKNOWN} but must not be <code>null</code>.
++     */
++    ProjectCoordinate getBase();
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/IModelProvider.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/IModelProvider.java
+new file mode 100644
+index 0000000..66061d0
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/IModelProvider.java
+@@ -0,0 +1,34 @@
++/**
++ * Copyright (c) 2010, 2012 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *    Marcel Bruch - initial API and implementation.
++ */
++package org.eclipse.recommenders.models;
++
++import java.io.Closeable;
++
++import org.eclipse.recommenders.models.archives.ModelArchiveCache;
++import org.eclipse.recommenders.utils.names.IName;
++
++import com.google.common.base.Optional;
++
++/**
++ * Minimal API for model providers. Model providers may use local zip-files obtained by, e.g., a
++ * {@link ModelArchiveCache} or may directly communicate with a remote web-service.
++ * <p>
++ * Clients of this API are typically code completion engines and auxiliary documentation providers in IDEs, or
++ * evaluation frameworks. The whole framework relies on the usage of {@link IBasedName}, i.e. the ability to assign a
++ * base {@link ProjectCoordinate} to the Java class container an {@link IName} originates in.
++ **/
++public interface IModelProvider<K extends IBasedName<?>, M> extends Closeable {
++
++    Optional<M> acquireModel(final K key);
++
++    void releaseModel(final M value);
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/IProjectCoordinateProvider.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/IProjectCoordinateProvider.java
+new file mode 100644
+index 0000000..6b4355a
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/IProjectCoordinateProvider.java
+@@ -0,0 +1,24 @@
++package org.eclipse.recommenders.models;
++
++
++/**
++ * Maps an IDE specific code element to a {@link ProjectCoordinate}.
++ * <p>
++ * Note that this interface is only a marker interface which will be implemented by each IDE-implementation
++ * independently. An Eclipse-based provider may contain methods like:
++ * 
++ * <pre>
++ * Optional&lt;ProjectCoordinate&gt; map(IMethod m);
++ * 
++ * Optional&lt;ProjectCoordinate&gt; map(IType t);
++ * 
++ * Optional&lt;ProjectCoordinate&gt; map(IPackgeFragmentRoot p);
++ * 
++ * Optional&lt;ProjectCoordinate&gt; map(IJavaProject p);
++ * </pre>
++ * 
++ * The API for other IDEs or evaluation frameworks may use other methods names or abstractions.
++ */
++public interface IProjectCoordinateProvider {
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/ProjectCoordinate.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/ProjectCoordinate.java
+new file mode 100644
+index 0000000..1127d85
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/ProjectCoordinate.java
+@@ -0,0 +1,73 @@
++package org.eclipse.recommenders.models;
++
++import org.apache.commons.lang3.builder.EqualsBuilder;
++import org.apache.commons.lang3.builder.HashCodeBuilder;
++import org.eclipse.recommenders.utils.Checks;
++import org.eclipse.recommenders.utils.annotations.Nullable;
++
++import com.google.common.base.Joiner;
++import com.google.common.base.Optional;
++import com.google.common.base.Strings;
++
++/**
++ * Represents a triple "group-id:artifact-id:version".
++ */
++public class ProjectCoordinate {
++
++    /**
++     * Constant that represents an unknown project coordinate. Use this constant whenever <code>null</code> or
++     * {@link Optional#absent()} is not appropriate.
++     */
++    public static final ProjectCoordinate UNKNOWN = new ProjectCoordinate("UNKNOWN", "UNKNOWN", "-1");
++
++    private final String groupId;
++    private final String artifactId;
++    private final String version;
++
++    /**
++     * Creates a new coordinate. Note that <code>null</code> values are replaced with an empty string.
++     */
++    public ProjectCoordinate(@Nullable String groupId, @Nullable String artifactId, @Nullable String version) {
++        this.groupId = Strings.nullToEmpty(groupId);
++        this.artifactId = Strings.nullToEmpty(artifactId);
++        this.version = Strings.nullToEmpty(version);
++    }
++
++    public String getGroupId() {
++        return groupId;
++    }
++
++    public String getArtifactId() {
++        return artifactId;
++    }
++
++    public String getVersion() {
++        return version;
++    }
++
++    @Override
++    public int hashCode() {
++        return HashCodeBuilder.reflectionHashCode(this, false);
++    }
++
++    @Override
++    public boolean equals(Object obj) {
++        return EqualsBuilder.reflectionEquals(this, obj);
++    }
++
++    @Override
++    public String toString() {
++        return Joiner.on(':').join(getGroupId(), getArtifactId(), getVersion());
++    }
++
++    public static ProjectCoordinate valueOf(String coord) {
++        String[] segments = coord.split(":");
++        Checks.ensureIsInRange(segments.length,
++                3,
++                3,
++                "Coordiante '%s' has invalid number of segments: %d",
++                coord,
++                segments.length);
++        return new ProjectCoordinate(segments[0], segments[1], segments[2]);
++    }
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/ProjectCoordinateProviders.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/ProjectCoordinateProviders.java
+new file mode 100644
+index 0000000..28ef4b8
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/ProjectCoordinateProviders.java
+@@ -0,0 +1,104 @@
++package org.eclipse.recommenders.models;
++
++import static com.google.common.base.Optional.of;
++
++import java.io.Closeable;
++import java.io.File;
++import java.io.IOException;
++import java.util.Map;
++
++import com.google.common.base.Function;
++import com.google.common.base.Optional;
++import com.google.common.collect.Maps;
++
++/**
++ * Set of IDE unspecific {@link ProjectCoordinate} providers that may be reused by IDE specific implementations of
++ * {@link IProjectCoordinateProvider}.
++ */
++public class ProjectCoordinateProviders {
++
++    /**
++     * Reads the {@link ProjectCoordinate}s of a project from an pom file - if it exists. Returns
++     * {@link Optional#absent()} if not found or parsing failed.
++     */
++    public static final Function<File, Optional<ProjectCoordinate>> POM_PROJECT =
++            new Function<File, Optional<ProjectCoordinate>>() {
++                public Optional<ProjectCoordinate> apply(File projectRoot) {
++                    return of(ProjectCoordinate.UNKNOWN);
++                };
++            };
++
++    /**
++     * Reads the {@link ProjectCoordinate}s of a project from <code>META-INF/MANIFEST.MF</code> file - if it exists.
++     * Returns {@link Optional#absent()} if not found or parsing failed.
++     */
++    public static final Function<File, Optional<ProjectCoordinate>> OSGI_PROJECT =
++            new Function<File, Optional<ProjectCoordinate>>() {
++                public Optional<ProjectCoordinate> apply(File projectRoot) {
++                    return of(ProjectCoordinate.UNKNOWN);
++                };
++            };
++
++    /**
++     * Reads the {@link ProjectCoordinate}s of a jar file from a pom.properties file - if it exists. Returns
++     * {@link Optional#absent()} if not found or parsing failed.
++     */
++    public static final Function<File, Optional<ProjectCoordinate>> POM_JAR =
++            new Function<File, Optional<ProjectCoordinate>>() {
++                public Optional<ProjectCoordinate> apply(File jarFile) {
++                    return of(ProjectCoordinate.UNKNOWN);
++                };
++            };
++
++    /**
++     * Reads the {@link ProjectCoordinate}s of a jar file's manifest - if it exists. Returns {@link Optional#absent()}
++     * if not found or parsing failed.
++     */
++    public static final Function<File, Optional<ProjectCoordinate>> OSGI_JAR =
++            new Function<File, Optional<ProjectCoordinate>>() {
++                public Optional<ProjectCoordinate> apply(File jarFile) {
++                    return of(ProjectCoordinate.UNKNOWN);
++                };
++            };
++
++    /**
++     * Uses a web service such as mvn central to find a {@link ProjectCoordinate}s based on the fingerprint of the given
++     * jar file. Returns {@link Optional#absent()} if the given jar is not known to the web service.
++     */
++    public static final Function<File, Optional<ProjectCoordinate>> FINGERPRINT_JAR =
++            new Function<File, Optional<ProjectCoordinate>>() {
++                public Optional<ProjectCoordinate> apply(File jarFile) {
++                    return of(ProjectCoordinate.UNKNOWN);
++                };
++            };
++
++    public static class ManualMappings implements Function<File, Optional<ProjectCoordinate>>, Closeable {
++
++        private File store;
++        private Map<File, ProjectCoordinate> mappings;
++
++        public ManualMappings(File store) {
++            this.store = store;
++            // load data...
++            mappings = Maps.newHashMap();
++        }
++
++        public ManualMappings(Map<File, ProjectCoordinate> mappings) {
++            this.mappings = mappings;
++        }
++
++        public Optional<ProjectCoordinate> apply(File location) {
++            return of(ProjectCoordinate.UNKNOWN);
++        }
++
++        public void put(File location, ProjectCoordinate coord) {
++            mappings.put(location, coord);
++        }
++
++        @Override
++        public void close() throws IOException {
++            if (store == null) return;
++
++        }
++    }
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/AbstractModelProvider.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/AbstractModelProvider.java
+new file mode 100644
+index 0000000..1e0e1e6
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/AbstractModelProvider.java
+@@ -0,0 +1,183 @@
++package org.eclipse.recommenders.models.archives;
++
++import static com.google.common.base.Optional.absent;
++import static com.google.common.base.Optional.of;
++import static org.eclipse.recommenders.utils.Checks.ensureIsNotNull;
++
++import java.io.IOException;
++import java.util.IdentityHashMap;
++import java.util.Map;
++import java.util.zip.ZipFile;
++
++import org.apache.commons.pool.BaseKeyedPoolableObjectFactory;
++import org.apache.commons.pool.impl.GenericKeyedObjectPool;
++import org.eclipse.recommenders.models.IBasedName;
++import org.eclipse.recommenders.models.IModelProvider;
++import org.eclipse.recommenders.models.archives.ModelArchiveCacheEvents.ModelArchiveInstalledEvent;
++import org.eclipse.recommenders.utils.IOUtils;
++import org.eclipse.recommenders.utils.annotations.Nullable;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
++import com.google.common.base.Optional;
++import com.google.common.collect.LinkedListMultimap;
++import com.google.common.collect.ListMultimap;
++import com.google.common.collect.Maps;
++import com.google.common.eventbus.Subscribe;
++
++public abstract class AbstractModelProvider<K extends IBasedName<?>, M> implements IModelProvider<K, M> {
++
++    private Logger log = LoggerFactory.getLogger(getClass());
++
++    // which zip files are currently open?
++    private Map<ModelArchiveCoordinate, ZipFile> openZips = Maps.newHashMap();
++
++    // which models are currently pooled?
++    private ListMultimap<ModelArchiveCoordinate, K> pooledModels = LinkedListMultimap.create();
++
++    // which models are currently borrowed to someone?
++    private IdentityHashMap<M, K> borrowedModels = Maps.newIdentityHashMap();
++
++    // will be a specific one for call models for example:
++    // REVIEW: do we need this?
++    private IModelArchiveCoordinateProvider modelIdProvider;
++
++    // model pool
++    // REVIEW: we may want to make pool creation configurable later?
++    private GenericKeyedObjectPool<K, M> modelPool = createModelPool();
++
++    public AbstractModelProvider(IModelArchiveCoordinateProvider modelIdProvider) {
++        this.modelIdProvider = modelIdProvider;
++    }
++
++    private GenericKeyedObjectPool<K, M> createModelPool() {
++        GenericKeyedObjectPool<K, M> pool = new GenericKeyedObjectPool<K, M>(new ModelPoolFactoryMediator());
++        pool.setMaxTotal(30);
++        pool.setMaxIdle(5);
++        pool.setWhenExhaustedAction(GenericKeyedObjectPool.WHEN_EXHAUSTED_FAIL);
++        // run clean up every 5 minutes:
++        pool.setTimeBetweenEvictionRunsMillis(5 * 60 * 1000);
++        // models are evictable after 5 minutes
++        pool.setMinEvictableIdleTimeMillis(5 * 60 * 1000);
++        return pool;
++    }
++
++    @Override
++    public Optional<M> acquireModel(K key) {
++        Optional<ModelArchiveCoordinate> opt = modelIdProvider.get(key.getBase());
++        if (!opt.isPresent())
++            return Optional.absent();
++        try {
++            M model = modelPool.borrowObject(key);
++            return of(model);
++        } catch (Exception e) {
++            log.error("Couldn't obtain model for " + key, e);
++            return absent();
++        }
++    }
++
++    protected abstract M createModel(K key, ZipFile modelArchive, ModelArchiveCoordinate modelId) throws IOException;
++
++    @Override
++    public void releaseModel(M model) {
++        try {
++            K key = borrowedModels.remove(model);
++            modelPool.returnObject(key, model);
++        } catch (Exception e) {
++            log.error("Exception while releasing Couldn't release model " + model, e);
++        }
++    }
++
++    protected void passivateModel(K key, M model, ModelArchiveCoordinate modelId) {
++    };
++
++    protected void destroyModel(K key, M model, ModelArchiveCoordinate modelId) {
++    };
++
++    @Subscribe
++    public void onEvent(ModelArchiveInstalledEvent e) {
++        ModelArchiveCoordinate modelId = e.coordinate;
++        closeZipFile(modelId);
++        clearPooledModels(modelId);
++    }
++
++    private void closeZipFile(@Nullable ModelArchiveCoordinate modelId) {
++        ZipFile zip = openZips.remove(modelId);
++        if (zip == null)
++            return;
++        closeQuietly(zip);
++    }
++
++    private void closeQuietly(ZipFile zip) {
++        try {
++            zip.close();
++        } catch (IOException e) {
++            // ignore
++        }
++    }
++
++    private void clearPooledModels(ModelArchiveCoordinate modelId) {
++        for (K key : pooledModels.get(modelId)) {
++            modelPool.clear(key);
++        }
++    }
++
++    @Override
++    public void close() throws IOException {
++        closePool();
++        closeZipFiles();
++    }
++
++    private void closePool() {
++        try {
++            modelPool.close();
++        } catch (Exception e) {
++            e.printStackTrace();
++        }
++    }
++
++    private void closeZipFiles() {
++        for (ZipFile zip : openZips.values()) {
++            closeQuietly(zip);
++        }
++    }
++
++    /**
++     * Mediates calls from Apache Commons Pool implementation to our {create,destroy,passivate}Model() methods above.
++     */
++    private final class ModelPoolFactoryMediator extends BaseKeyedPoolableObjectFactory<K, M> {
++        @Override
++        public M makeObject(K key) throws Exception {
++            ModelArchiveCoordinate modelId = ensureIsNotNull(modelIdProvider.get(key.getBase()).orNull());
++            ZipFile zipFile = openZips.get(modelId);
++            if (zipFile == null)
++                return null;
++            M model = createModel(key, zipFile, modelId);
++            pooledModels.put(modelId, key);
++            return model;
++        }
++
++        /**
++         * Removes the given model from the list of tracked pooled models and closes the zip-file this model originates
++         * from if no other model is loaded from this zip-file.
++         * 
++         * @see AbstractModelProvider#destroyModel(IBasedName, Object, ModelArchiveCoordinate)
++         */
++        @Override
++        public void destroyObject(K key, M model) throws Exception {
++            ModelArchiveCoordinate modelId = ensureIsNotNull(modelIdProvider.get(key.getBase()).orNull());
++            pooledModels.remove(key, model);
++            // if there are no more models loaded
++            if (!pooledModels.containsKey(modelId)) {
++                closeZipFile(modelId);
++            }
++            destroyModel(key, model, modelId);
++        }
++
++        @Override
++        public void passivateObject(K key, M model) throws Exception {
++            ModelArchiveCoordinate modelId = ensureIsNotNull(modelIdProvider.get(key.getBase()).orNull());
++            passivateModel(key, model, modelId);
++        }
++    }
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/IModelArchive.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/IModelArchive.java
+new file mode 100644
+index 0000000..ca952bd
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/IModelArchive.java
+@@ -0,0 +1,71 @@
++/**
++ * Copyright (c) 2010, 2012 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *    Marcel Bruch - initial API and implementation.
++ */
++package org.eclipse.recommenders.models.archives;
++
++import java.io.Closeable;
++import java.io.IOException;
++
++import org.eclipse.recommenders.models.IModelProvider;
++import org.eclipse.recommenders.models.ProjectCoordinate;
++
++import com.google.common.base.Optional;
++
++/**
++ * A {@link IModelArchive} is a file containing recommendation models for a given {@link ProjectCoordinate}, typically
++ * downloaded by a {@link ModelArchiveCache}. These files are typically in ZIP format but don't have to.
++ * <p>
++ * This interface assumes that models can be <em>acquired</em> from a {@link IModelArchive} and should be
++ * <em>released</em> after they've been used by the client. This allows implementations to leverage pooling or caching
++ * strategies for models to improve performance.
++ * <p>
++ * Note that typically only one {@link IModelArchive} exists per coordinate but several instances of the same model may
++ * exist (e.g., when using object pools to improve performance).
++ */
++public interface IModelArchive<K, M> extends Closeable {
++
++    /**
++     * Informs the caller whether this archive contains a model for the given key. This method does not load the model.
++     */
++    boolean hasModel(final K key);
++
++    /**
++     * Returns a model for the given key. The model may be a cached instance. If no model was loaded yet - or no free
++     * instance is available in the pool - the archive may create a fresh instance.
++     * <p>
++     * Note that an implementation may decide to only keep a limited number of models per key in memory and may return
++     * {@link Optional#absent()} if the pool is exhausted.
++     * 
++     * @see #releaseModel(Object)
++     */
++    Optional<M> acquireModel(final K key);
++
++    /**
++     * Puts a model back to the archive. The model is not allowed to be used by the caller anymore after returning it,
++     * i.e., if a caller needs the model again later it needs to be acquired again.
++     * 
++     * @see #acquireModel(Object)
++     */
++    void releaseModel(final M value);
++
++    /**
++     * Callback that allows the model archive implementation to open resources/stream, build internal indexes and the
++     * like. These resources should be release when {@link #close()} is called.
++     * 
++     * @see #close()
++     */
++    void open();
++
++    /**
++     * Closes the this archive. This method is expected to be called by {@link IModelProvider} when they are closed.
++     */
++    @Override
++    public void close() throws IOException;
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/IModelArchiveCoordinateProvider.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/IModelArchiveCoordinateProvider.java
+new file mode 100644
+index 0000000..295321a
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/IModelArchiveCoordinateProvider.java
+@@ -0,0 +1,62 @@
++package org.eclipse.recommenders.models.archives;
++
++import java.io.Closeable;
++import java.io.IOException;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++
++import com.google.common.base.Optional;
++
++/**
++ * Responsible to find and maintain a mapping from a {@link ProjectCoordinate} to a {@link ModelArchiveCoordinate}.
++ * Implementors should be able to persist manually specified mappings and reload them on restart.
++ * <p>
++ * This interface is not expected to be injected by clients directly.<br>
++ * This interface is expected to be extended by model providers.
++ */
++public interface IModelArchiveCoordinateProvider extends Closeable {
++
++    /**
++     * Returns the model-type this provider returns models for, e.g., calls, ovrs etc.
++     */
++    public String getType();
++
++    /**
++     * Framework callback that allows an implementor to perform some IO operations like loading manual mappings from a
++     * file etc.
++     * 
++     * @throws IOException
++     */
++    public void open() throws IOException;
++
++    /**
++     * Returns the best matching {@link ModelArchiveCoordinate} for the given {@link ProjectCoordinate} - if any. This
++     * call may lookup the best matches from the {@link ModelArchiveCache}'s model index. If a manual mapping was
++     * specified before (using {@link #set(ProjectCoordinate, ModelArchiveCoordinate)}) that coordinate will be
++     * returned.
++     */
++    Optional<ModelArchiveCoordinate> get(ProjectCoordinate pc);
++
++    /**
++     * Manually sets the {@link ModelArchiveCoordinate} for the given {@link ProjectCoordinate}. An existing mapping
++     * will be overwritten. This mapping is expected to be persisted by the implementor.
++     */
++    void setOverride(ProjectCoordinate pc, ModelArchiveCoordinate modelId);
++
++    /**
++     * Returns for the model in the model repository.
++     */
++    public abstract Optional<ModelArchiveCoordinate> searchModelArchive(ProjectCoordinate pc);
++
++    /**
++     * Removes a previously found mapping from {@link ProjectCoordinate} to any {@link ModelArchiveCoordinate}. If the
++     * mapping was persisted previously, this mapping should still be gone after restart.
++     */
++    void removeOverride(ProjectCoordinate pc);
++
++    /**
++     * Returns wether the mapping for the given {@link ProjectCoordinate} to a {@link ModelArchiveCoordinate} is overridden.
++     */
++    boolean isOverridden(ProjectCoordinate pc);
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/ModelArchiveCache.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/ModelArchiveCache.java
+new file mode 100644
+index 0000000..61cda38
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/ModelArchiveCache.java
+@@ -0,0 +1,84 @@
++/**
++ * Copyright (c) 2010, 2012 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *    Marcel Bruch - initial API and implementation.
++ */
++package org.eclipse.recommenders.models.archives;
++
++import java.io.File;
++import java.io.IOException;
++
++import org.eclipse.core.runtime.IProgressMonitor;
++import org.eclipse.recommenders.models.ProjectCoordinate;
++
++import com.google.common.base.Optional;
++
++/**
++ * A {@link ModelArchiveCache} is responsible for downloading and caching (file-based) model artifacts from a remote
++ * maven repository. It has a local working directory where it stores model artifacts and some meta-data, and is
++ * configured with a remote (maven) repository URL from which it fetches model artifacts on demand.
++ */
++public abstract class ModelArchiveCache {
++
++    /**
++     * The coordinate under which the model search index of the remote model repository is addressable.
++     */
++    public static ModelArchiveCoordinate INDEX = new ModelArchiveCoordinate("org.eclipse.recommenders", "index",
++            "index", "zip", "0.0.0-SNAPSHOT");
++
++    /**
++     * Utility method that checks whether the given coordinate is the index coordinate.
++     */
++    public static boolean isModelIndex(ModelArchiveCoordinate coord) {
++        return INDEX.equals(coord);
++    }
++
++    /**
++     * Changes the remote repository used to resolve and download artifacts. This change takes effect immediately.
++     */
++    public abstract void setRemote(String url);
++
++    /**
++     * Resolves the given model coordinate to a local file and downloads the corresponding file from the remote
++     * repository if not locally available.
++     * 
++     * @return the local copy of the model artifact
++     * @throws IOException
++     *             if no model could be downloaded due to, e.g., the coordinate does not exist on the remote repository
++     *             or a network/io error occurred.
++     */
++    public abstract void resolve(ModelArchiveCoordinate model, IProgressMonitor monitor) throws IOException;
++
++    /**
++     * Deletes the artifact represented by the given coordinate from the local file system.
++     */
++    public abstract void delete(ModelArchiveCoordinate model, IProgressMonitor monitor) throws IOException;
++
++    /**
++     * Checks if the file for the given coordinate exists in the local file system.
++     */
++    public abstract boolean isCached(ModelArchiveCoordinate coord);
++
++    /**
++     * Returns the file for the given coordinate - if it exists. Note that this call does <b>not</b> download any
++     * resources from the remote repository. It only touches the local file system.
++     */
++    public abstract Optional<File> getLocation(ModelArchiveCoordinate coord);
++
++    /**
++     * Searches the model index for all model archives matching the given {@link ProjectCoordinate} and model-type.
++     */
++    public abstract ModelArchiveCoordinate[] findModelArchives(ProjectCoordinate projectCoord, String modelType);
++
++    /**
++     * Searches the model index for the best model archive matching the given {@link ProjectCoordinate} and model-type.
++     */
++    public abstract Optional<ModelArchiveCoordinate> findBestModelArchive(ProjectCoordinate projectCoord,
++            String modelType);
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/ModelArchiveCacheEvents.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/ModelArchiveCacheEvents.java
+new file mode 100644
+index 0000000..3b856b1
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/ModelArchiveCacheEvents.java
+@@ -0,0 +1,78 @@
++package org.eclipse.recommenders.models.archives;
++
++import examples.UsingModelArchiveCache;
++
++/**
++ * These events are fired whenever the state of the {@link ModelArchiveCache} or its contents have changed to allow
++ * others participants to respond to these state changes. Participants can register by subscribing themselves as
++ * listeners to the Recommenders' workbench-wide event bus and adding corresponding listener methods like :
++ * 
++ * <pre>
++ * @Subscribe
++ * onEvent(ModelArchiveUpdatedEvent e){...}
++ * </pre>
++ * 
++ * @see {@link UsingModelArchiveCache} for more example usages.
++ */
++public class ModelArchiveCacheEvents {
++
++    /**
++     * Base class for all events related to {@link ModelArchiveCache}.
++     */
++    public abstract static class ModelArchiveCacheEvent {
++
++        public final ModelArchiveCache cache;
++
++        public ModelArchiveCacheEvent(ModelArchiveCache cache) {
++            this.cache = cache;
++        }
++    }
++
++    /**
++     * Fired when the remote repository URL has changed. This usually triggers a download of the model index and may
++     * cause updates of existing model archives.
++     */
++    public static class RemoteRepositoryChangedEvent extends ModelArchiveCacheEvent {
++
++        public RemoteRepositoryChangedEvent(ModelArchiveCache cache) {
++            super(cache);
++        }
++    }
++
++    /**
++     * Fired when the given model repository instance was created. Allows listeners to trigger additional actions like
++     * model index updates.
++     */
++    public static class ModelArchiveCacheOpenedEvent extends ModelArchiveCacheEvent {
++
++        public ModelArchiveCacheOpenedEvent(ModelArchiveCache cache) {
++            super(cache);
++        }
++    }
++
++    /**
++     * Fired when the given cache is shutdown. Allows listeners to close other resources based on this repository like
++     * search indexes.
++     */
++    public static class ModelArchiveCacheClosedEvent extends ModelArchiveCacheEvent {
++
++        public ModelArchiveCacheClosedEvent(ModelArchiveCache cache) {
++            super(cache);
++        }
++    }
++
++    /**
++     * Fired whenever an older model archive was replaced by a newer model archive.
++     * <p>
++     * Note that index updates are also published as {@link ModelArchiveInstalledEvent}s.
++     */
++    public static class ModelArchiveInstalledEvent extends ModelArchiveCacheEvent {
++
++        public ModelArchiveCoordinate coordinate;
++
++        public ModelArchiveInstalledEvent(ModelArchiveCache cache, ModelArchiveCoordinate model) {
++            super(cache);
++            this.coordinate = model;
++        }
++    }
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/ModelArchiveCoordinate.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/ModelArchiveCoordinate.java
+new file mode 100644
+index 0000000..13394ca
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/archives/ModelArchiveCoordinate.java
+@@ -0,0 +1,99 @@
++package org.eclipse.recommenders.models.archives;
++
++import org.apache.commons.lang3.builder.EqualsBuilder;
++import org.apache.commons.lang3.builder.HashCodeBuilder;
++import org.eclipse.recommenders.utils.Throws;
++
++import com.google.common.base.Joiner;
++import com.google.common.base.Strings;
++
++/**
++ * Represents a Maven-like artifact coordinate which consists of "group-id:artifact-id:classifier:extension:version".
++ * This class is used instead of Aether's Artifact class (i) to hide the usage of the Aether from clients, and (ii) to
++ * make clear that its only a resource identifier; it does not locate a (resolved) resource.
++ */
++public final class ModelArchiveCoordinate {
++
++    public static final ModelArchiveCoordinate UNKNOWN = new ModelArchiveCoordinate("unknown", "unknown", "unknown",
++            "unknown", "0.0.0");
++
++    private final String groupId;
++    private final String artifactId;
++    private final String version;
++    private final String classifier;
++    private final String extension;
++
++    public ModelArchiveCoordinate(String groupId, String artifactId, String classifier, String extension, String version) {
++        this.groupId = Strings.nullToEmpty(groupId);
++        this.artifactId = Strings.nullToEmpty(artifactId);
++        this.classifier = Strings.nullToEmpty(classifier);
++        this.extension = Strings.nullToEmpty(extension);
++        this.version = Strings.nullToEmpty(version);
++    }
++
++    public String getGroupId() {
++        return groupId;
++    }
++
++    public String getArtifactId() {
++        return artifactId;
++    }
++
++    public String getVersion() {
++        return version;
++    }
++
++    public String getClassifier() {
++        return classifier;
++    }
++
++    public String getExtension() {
++        return extension;
++    }
++
++    @Override
++    public int hashCode() {
++        return HashCodeBuilder.reflectionHashCode(this, false);
++    }
++
++    @Override
++    public boolean equals(Object obj) {
++        return EqualsBuilder.reflectionEquals(this, obj);
++    }
++
++    @Override
++    public String toString() {
++        return Joiner.on(':').join(getGroupId(), getArtifactId(), getClassifier(), getExtension(), getVersion());
++    }
++
++    public static ModelArchiveCoordinate valueOf(String coord) {
++        String[] split = coord.split(":");
++        String gid = null, aid = null, ext = null, clss = null, vers = null;
++        switch (split.length) {
++        case 1:
++        case 2:
++            throw Throws.throwIllegalArgumentException("Invalid coordinate format. It has only %d segments: %s",
++                    split.length,
++                    coord);
++        case 3:
++            vers = split[2];
++            break;
++        case 4:
++            clss = split[2];
++            vers = split[3];
++            break;
++        case 5:
++            clss = split[2];
++            ext = split[3];
++            vers = split[4];
++            break;
++        default:
++            Throws.throwIllegalArgumentException("Invalid coordinate format. It has only %d segments: %s",
++                    split.length,
++                    coord);
++        }
++        gid = split[0];
++        aid = split[1];
++        return new ModelArchiveCoordinate(gid, aid, clss, ext, vers);
++    }
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/DependencyType.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/DependencyType.java
+new file mode 100644
+index 0000000..1121ac5
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/DependencyType.java
+@@ -0,0 +1,18 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.models.mapping;
++
++/**
++ * Enumerate the different types of entries which can be find in the workspace and we are interested in.
++ */
++public enum DependencyType {
++    PROJECT, JRE, JAR
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/IDependencyInfo.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/IDependencyInfo.java
+new file mode 100644
+index 0000000..e370c98
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/IDependencyInfo.java
+@@ -0,0 +1,28 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.models.mapping;
++
++import java.io.File;
++
++import com.google.common.base.Optional;
++
++/**
++ * Represent an element in the workspace containing the corresponding file, type and other attributes.
++ */
++public interface IDependencyInfo {
++
++    public File getFile();
++
++    public DependencyType getType();
++
++    public Optional<String> getAttribute(String key);
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/IMappingProvider.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/IMappingProvider.java
+new file mode 100644
+index 0000000..d0b4809
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/IMappingProvider.java
+@@ -0,0 +1,29 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.models.mapping;
++
++import java.util.List;
++
++/**
++ * The Mapping interface provide the functionality for the mapping between IDependencyInfo and ProjectCoordinate
++ */
++public interface IMappingProvider extends IMappingStrategy {
++
++    public List<IMappingStrategy> getStrategies();
++
++    public void addStrategy(IMappingStrategy strategy);
++
++    public void setStrategy(List<IMappingStrategy> strategies);
++
++    public void storeMappings();
++
++    public void loadMappings();
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/IMappingStrategy.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/IMappingStrategy.java
+new file mode 100644
+index 0000000..2a4b42b
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/IMappingStrategy.java
+@@ -0,0 +1,26 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.models.mapping;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++
++import com.google.common.base.Optional;
++
++/**
++ * Strategy for extract the ProjectCoordinate of a element.
++ */
++public interface IMappingStrategy {
++
++    public Optional<ProjectCoordinate> searchForProjectCoordinate(IDependencyInfo dependencyInfo);
++
++    public boolean isApplicable(DependencyType dependencyType);
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/AbstractStrategy.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/AbstractStrategy.java
+new file mode 100644
+index 0000000..e94b56b
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/AbstractStrategy.java
+@@ -0,0 +1,33 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.models.mapping.impl;
++
++import static com.google.common.base.Optional.absent;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.models.mapping.IDependencyInfo;
++import org.eclipse.recommenders.models.mapping.IMappingStrategy;
++
++import com.google.common.base.Optional;
++
++public abstract class AbstractStrategy implements IMappingStrategy {
++
++    @Override
++    public Optional<ProjectCoordinate> searchForProjectCoordinate(IDependencyInfo dependencyInfo) {
++        if (!isApplicable(dependencyInfo.getType())) {
++            return absent();
++        }
++        return extractProjectCoordinateInternal(dependencyInfo);
++    }
++
++    protected abstract Optional<ProjectCoordinate> extractProjectCoordinateInternal(IDependencyInfo dependencyInfo);
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/DependencyInfo.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/DependencyInfo.java
+new file mode 100644
+index 0000000..f745298
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/DependencyInfo.java
+@@ -0,0 +1,90 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.models.mapping.impl;
++
++import java.io.File;
++import java.util.Collections;
++import java.util.Map;
++
++import org.eclipse.recommenders.models.mapping.DependencyType;
++import org.eclipse.recommenders.models.mapping.IDependencyInfo;
++import org.eclipse.recommenders.utils.Checks;
++
++import com.google.common.base.Optional;
++
++public class DependencyInfo implements IDependencyInfo {
++
++    public static final String JRE_VERSION_IDE = "JRE_VERSION_IDE";
++
++    private final File file;
++    private final DependencyType type;
++    private final Map<String, String> attributes;
++
++    public DependencyInfo(File file, DependencyType type) {
++        this(file, type, Collections.<String, String> emptyMap());
++    }
++
++    public DependencyInfo(File file, DependencyType type, Map<String, String> attributes) {
++        this.file = file;
++        this.type = type;
++        this.attributes = Checks.ensureIsNotNull(attributes);
++    }
++
++    @Override
++    public File getFile() {
++        return file;
++    }
++
++    @Override
++    public DependencyType getType() {
++        return type;
++    }
++
++    @Override
++    public Optional<String> getAttribute(String key) {
++        return Optional.fromNullable(attributes.get(key));
++    }
++
++    @Override
++    public int hashCode() {
++        final int prime = 31;
++        int result = 1;
++        result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
++        result = prime * result + ((file == null) ? 0 : file.hashCode());
++        result = prime * result + ((type == null) ? 0 : type.hashCode());
++        return result;
++    }
++
++    @Override
++    public boolean equals(Object obj) {
++        if (this == obj)
++            return true;
++        if (obj == null)
++            return false;
++        if (getClass() != obj.getClass())
++            return false;
++        DependencyInfo other = (DependencyInfo) obj;
++        if (attributes == null) {
++            if (other.attributes != null)
++                return false;
++        } else if (!attributes.equals(other.attributes))
++            return false;
++        if (file == null) {
++            if (other.file != null)
++                return false;
++        } else if (!file.equals(other.file))
++            return false;
++        if (type != other.type)
++            return false;
++        return true;
++    }
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/FingerprintStrategy.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/FingerprintStrategy.java
+new file mode 100644
+index 0000000..3e23d77
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/FingerprintStrategy.java
+@@ -0,0 +1,59 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.models.mapping.impl;
++
++import static com.google.common.base.Optional.absent;
++import static com.google.common.base.Optional.fromNullable;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.models.mapping.DependencyType;
++import org.eclipse.recommenders.models.mapping.IDependencyInfo;
++import org.eclipse.recommenders.utils.Fingerprints;
++import org.sonatype.aether.util.artifact.DefaultArtifact;
++
++import com.google.common.base.Optional;
++
++public class FingerprintStrategy extends AbstractStrategy {
++
++    private final IndexUtilities indexer;
++
++    public FingerprintStrategy(IndexUtilities indexer) {
++        this.indexer = indexer;
++    }
++
++    @Override
++    public boolean isApplicable(DependencyType dependencyType) {
++        return dependencyType == DependencyType.JAR;
++    }
++
++    @Override
++    protected Optional<ProjectCoordinate> extractProjectCoordinateInternal(IDependencyInfo dependencyInfo) {
++        String fingerprint = Fingerprints.sha1(dependencyInfo.getFile());
++        indexer.open();
++        Optional<String> optionalCoordinateString = indexer.searchByFingerprint(fingerprint);
++        indexer.close();
++        if (!optionalCoordinateString.isPresent()) {
++            return absent();
++        }
++        return extractProjectCoordinate(optionalCoordinateString.get());
++    }
++
++    private Optional<ProjectCoordinate> extractProjectCoordinate(String string) {
++        try {
++            DefaultArtifact artifact = new DefaultArtifact(string);
++            return fromNullable(new ProjectCoordinate(artifact.getGroupId(), artifact.getArtifactId(),
++                    artifact.getVersion()));
++        } catch (IllegalArgumentException e) {
++            return absent();
++        }
++    }
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/IndexUtilities.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/IndexUtilities.java
+new file mode 100644
+index 0000000..6e22fa8
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/IndexUtilities.java
+@@ -0,0 +1,107 @@
++/**
++ * Copyright (c) 2010, 2012 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *    Marcel Bruch - initial API and implementation.
++ *    Olav Lenz - modifications for project coordinates mapping
++ */
++package org.eclipse.recommenders.models.mapping.impl;
++
++import static com.google.common.base.Optional.absent;
++import static com.google.common.base.Optional.fromNullable;
++import static com.google.common.io.Closeables.closeQuietly;
++import static org.eclipse.recommenders.utils.Constants.F_COORDINATE;
++import static org.eclipse.recommenders.utils.Constants.F_FINGERPRINTS;
++import static org.eclipse.recommenders.utils.Constants.F_SYMBOLIC_NAMES;
++
++import java.io.Closeable;
++import java.io.File;
++
++import org.apache.lucene.document.Document;
++import org.apache.lucene.index.IndexReader;
++import org.apache.lucene.index.Term;
++import org.apache.lucene.search.BooleanClause.Occur;
++import org.apache.lucene.search.BooleanQuery;
++import org.apache.lucene.search.IndexSearcher;
++import org.apache.lucene.search.TermQuery;
++import org.apache.lucene.search.TopDocs;
++import org.apache.lucene.store.Directory;
++import org.apache.lucene.store.FSDirectory;
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++
++import com.google.common.base.Optional;
++
++/**
++ * Lighter version of ModelRepositoryIndex in *.recommendrs.rcp
++ */
++public class IndexUtilities implements Closeable {
++
++    private final Logger log = LoggerFactory.getLogger(getClass());
++    private Directory directory;
++    private IndexReader reader;
++    private final File location;
++
++    public IndexUtilities(File location) {
++        this.location = location;
++    }
++
++    public void open() {
++        try {
++            directory = FSDirectory.open(location);
++            reader = IndexReader.open(directory);
++        } catch (Exception e) {
++            log.error("Failed to open search index.", e); //$NON-NLS-1$
++        }
++    }
++
++    @Override
++    public void close() {
++        closeQuietly(reader);
++        closeQuietly(directory);
++    }
++
++    public boolean exists() {
++        return location.exists();
++    }
++    
++    public Optional<String> searchByArtifactId(String artifactId) {
++        Term t1 = new Term(F_SYMBOLIC_NAMES, artifactId);
++        return findByTerm(t1);
++    }
++
++    public Optional<String> searchByFingerprint(String fingerprint) {
++        Term t1 = new Term(F_FINGERPRINTS, fingerprint);
++        return findByTerm(t1);
++    }
++
++    private Optional<String> findByTerm(Term... terms) {
++        if (reader == null) {
++            return absent();
++        }
++        BooleanQuery query = new BooleanQuery();
++        for (Term t : terms) {
++            TermQuery q = new TermQuery(t);
++            query.add(q, Occur.MUST);
++        }
++
++        try {
++            IndexSearcher searcher = new IndexSearcher(reader);
++            TopDocs matches = searcher.search(query, 5);
++            searcher.close();
++            if (matches.totalHits <= 0){
++                return absent();
++            }
++            Document doc = reader.document(matches.scoreDocs[0].doc);
++            String modelCoordinate = doc.get(F_COORDINATE);
++            return fromNullable(modelCoordinate);
++        } catch (Exception e) {
++            return absent();
++        }
++    }
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/JREIDEVersionStrategy.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/JREIDEVersionStrategy.java
+new file mode 100644
+index 0000000..b1e24f7
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/JREIDEVersionStrategy.java
+@@ -0,0 +1,41 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.models.mapping.impl;
++
++import static com.google.common.base.Optional.absent;
++import static com.google.common.base.Optional.fromNullable;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.models.mapping.DependencyType;
++import org.eclipse.recommenders.models.mapping.IDependencyInfo;
++
++import com.google.common.base.Optional;
++
++public class JREIDEVersionStrategy extends AbstractStrategy {
++
++    @Override
++    protected Optional<ProjectCoordinate> extractProjectCoordinateInternal(IDependencyInfo dependencyInfo) {
++        Optional<String> optionalVersion = dependencyInfo.getAttribute(DependencyInfo.JRE_VERSION_IDE);
++        if (!optionalVersion.isPresent()) {
++            return absent();
++        }
++        String version = optionalVersion.get();
++
++        ProjectCoordinate projectCoordinate = new ProjectCoordinate("jre", "jre", version);
++        return fromNullable(projectCoordinate);
++    }
++
++    @Override
++    public boolean isApplicable(DependencyType dependencyType) {
++        return dependencyType == DependencyType.JRE;
++    }
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/JREReleaseFileStrategy.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/JREReleaseFileStrategy.java
+new file mode 100644
+index 0000000..3b936ed
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/JREReleaseFileStrategy.java
+@@ -0,0 +1,78 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.models.mapping.impl;
++
++import static com.google.common.base.Optional.absent;
++import static com.google.common.base.Optional.fromNullable;
++
++import java.io.File;
++import java.io.FileInputStream;
++import java.io.FileNotFoundException;
++import java.io.IOException;
++import java.io.InputStream;
++import java.util.Properties;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.models.mapping.DependencyType;
++import org.eclipse.recommenders.models.mapping.IDependencyInfo;
++import org.eclipse.recommenders.utils.IOUtils;
++
++import com.google.common.base.Optional;
++
++public class JREReleaseFileStrategy extends AbstractStrategy {
++
++    @Override
++    protected Optional<ProjectCoordinate> extractProjectCoordinateInternal(IDependencyInfo dependencyInfo) {
++        Optional<FileInputStream> optionalReleaseFileInputStream = readReleaseFileIn(dependencyInfo.getFile());
++        if (!optionalReleaseFileInputStream.isPresent()) {
++            return absent();
++        }
++        InputStream releaseFileInputStream = optionalReleaseFileInputStream.get();
++        try {
++            return extractProjectCoordinateOfReleaseFile(releaseFileInputStream);
++        } catch (IOException e) {
++            return absent();
++        } finally {
++            IOUtils.closeQuietly(releaseFileInputStream);
++        }
++    }
++
++    private Optional<ProjectCoordinate> extractProjectCoordinateOfReleaseFile(InputStream releaseFileInputStream)
++            throws IOException {
++        Properties properties = new Properties();
++        properties.load(releaseFileInputStream);
++        String version = properties.getProperty("JAVA_VERSION");
++        if (version == null) {
++            return absent();
++        }
++        // Replace of " is needed because of the release file structure
++        version = version.replace("\"", "");
++
++        ProjectCoordinate projectCoordinate = new ProjectCoordinate("jre", "jre", version);
++
++        return fromNullable(projectCoordinate);
++    }
++
++    private Optional<FileInputStream> readReleaseFileIn(File folderPath) {
++        try {
++            File file = new File(folderPath.getAbsolutePath() + File.separator + "release");
++            return fromNullable(new FileInputStream(file));
++        } catch (FileNotFoundException e) {
++            return absent();
++        }
++    }
++
++    @Override
++    public boolean isApplicable(DependencyType dependencyType) {
++        return dependencyType == DependencyType.JRE;
++    }
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/MappingProvider.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/MappingProvider.java
+new file mode 100644
+index 0000000..866b0e2
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/MappingProvider.java
+@@ -0,0 +1,109 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.models.mapping.impl;
++
++import static com.google.common.base.Optional.absent;
++import static com.google.common.base.Optional.fromNullable;
++
++import java.util.List;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.models.mapping.DependencyType;
++import org.eclipse.recommenders.models.mapping.IDependencyInfo;
++import org.eclipse.recommenders.models.mapping.IMappingProvider;
++import org.eclipse.recommenders.models.mapping.IMappingStrategy;
++import org.eclipse.recommenders.utils.annotations.Testing;
++
++import com.google.common.base.Optional;
++import com.google.common.cache.Cache;
++import com.google.common.cache.CacheBuilder;
++import com.google.common.cache.CacheLoader;
++import com.google.common.cache.CacheStats;
++import com.google.common.collect.Lists;
++
++public class MappingProvider implements IMappingProvider {
++
++    List<IMappingStrategy> strategies = Lists.newArrayList();
++    private Cache<IDependencyInfo, Optional<ProjectCoordinate>> cache;
++
++    public MappingProvider() {
++        cache = CacheBuilder.newBuilder().maximumSize(200)
++                .build(new CacheLoader<IDependencyInfo, Optional<ProjectCoordinate>>() {
++
++                    @Override
++                    public Optional<ProjectCoordinate> load(IDependencyInfo key) throws Exception {
++
++                        return extractProjectCoordinate(key);
++                    }
++                });
++    }
++
++    @Override
++    public List<IMappingStrategy> getStrategies() {
++        return strategies;
++    }
++
++    @Override
++    public void addStrategy(IMappingStrategy strategy) {
++        strategies.add(strategy);
++    }
++
++    @Override
++    public void setStrategy(List<IMappingStrategy> strategies) {
++        this.strategies = strategies;
++    }
++
++    @Override
++    public Optional<ProjectCoordinate> searchForProjectCoordinate(IDependencyInfo dependencyInfo) {
++        try {
++            return cache.get(dependencyInfo);
++        } catch (Exception e) {
++            return absent();
++        }
++    }
++
++    private Optional<ProjectCoordinate> extractProjectCoordinate(IDependencyInfo dependencyInfo) {
++        for (IMappingStrategy strategy : strategies) {
++            Optional<ProjectCoordinate> optionalProjectCoordinate = strategy.searchForProjectCoordinate(dependencyInfo);
++            if (optionalProjectCoordinate.isPresent()) {
++                return optionalProjectCoordinate;
++            }
++        }
++        return absent();
++    }
++
++    @Override
++    public boolean isApplicable(DependencyType dependencyTyp) {
++        for (IMappingStrategy mappingStrategy : strategies) {
++            if (mappingStrategy.isApplicable(dependencyTyp)) {
++                return true;
++            }
++        }
++        return false;
++    }
++
++    @Override
++    public void storeMappings() {
++        // TODO: Store mappings when the IDE is closing
++    }
++
++    @Override
++    public void loadMappings() {
++        // TODO: Load mappings when the IDE starts
++        // TODO: Needed at least guava 11.0.2, to load stored mappings into the cache.
++    }
++
++    @Testing
++    public Optional<CacheStats> getCacheStats() {
++        return fromNullable(cache.stats());
++    }
++
++}
+diff --git a/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/MavenPomPropertiesStrategy.java b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/MavenPomPropertiesStrategy.java
+new file mode 100644
+index 0000000..b5e015a
+--- /dev/null
++++ b/plugins/org.eclipse.recommenders.models/src/org/eclipse/recommenders/models/mapping/impl/MavenPomPropertiesStrategy.java
+@@ -0,0 +1,188 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.models.mapping.impl;
++
++import static com.google.common.base.Optional.absent;
++import static com.google.common.base.Optional.fromNullable;
++
++import java.io.File;
++import java.io.IOException;
++import java.io.InputStream;
++import java.util.Enumeration;
++import java.util.Properties;
++import java.util.Set;
++import java.util.jar.JarEntry;
++import java.util.jar.JarFile;
++import java.util.zip.ZipEntry;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.models.mapping.DependencyType;
++import org.eclipse.recommenders.models.mapping.IDependencyInfo;
++import org.eclipse.recommenders.utils.IOUtils;
++import org.eclipse.recommenders.utils.annotations.Testing;
++import org.eclipse.recommenders.utils.archive.MavenPomJarIdExtractor;
++
++import com.google.common.base.Optional;
++import com.google.common.collect.Sets;
++
++/**
++ * Implementation based on {@link MavenPomJarIdExtractor}.
++ */
++public class MavenPomPropertiesStrategy extends AbstractStrategy {
++
++    private static final String POM_PROPERTIES_FILE_REGEX = "META-INF/maven/.*/.*/pom.properties";
++    public static final String PROPERTY_KEY_VERSION = "version";
++    public static final String PROPERTY_KEY_ARTIFACT_ID = "artifactId";
++    public static final String PROPERTY_KEY_GROUP_ID = "groupId";
++
++    private final IFileToJarFileConverter jarFileConverter;
++
++    public MavenPomPropertiesStrategy() {
++        this.jarFileConverter = new DefaultJarFileConverter();
++    }
++
++    @Testing
++    public MavenPomPropertiesStrategy(IFileToJarFileConverter fileToJarFileConverter) {
++        this.jarFileConverter = fileToJarFileConverter;
++    }
++
++    @Override
++    protected Optional<ProjectCoordinate> extractProjectCoordinateInternal(IDependencyInfo dependencyInfo) {
++        Optional<JarFile> optionalJarFile = readJarFileIn(dependencyInfo.getFile());
++        if (!optionalJarFile.isPresent()) {
++            return absent();
++        }
++        JarFile jarFile = optionalJarFile.get();
++        try {
++            return extractProjectCoordinateOfJarFile(jarFile);
++        } catch (IOException e) {
++            return absent();
++        } finally {
++            close(jarFile);
++        }
++    }
++
++    private void close(JarFile jarFile) {
++        try {
++            jarFile.close();
++        } catch (IOException e) {
++            e.printStackTrace();
++        }
++    }
++
++    private Optional<ProjectCoordinate> extractProjectCoordinateOfJarFile(JarFile jarFile) throws IOException {
++        Set<ZipEntry> pomZipEntries = findPomPropertiesEntries(jarFile);
++        for (ZipEntry zipEntry : pomZipEntries) {
++            InputStream pomPropertiesInputStream;
++            pomPropertiesInputStream = jarFile.getInputStream(zipEntry);
++            Optional<ProjectCoordinate> projectCoordinate = parseProjectCoordinate(pomPropertiesInputStream,
++                    zipEntry.getName());
++            IOUtils.closeQuietly(pomPropertiesInputStream);
++            if (projectCoordinate.isPresent()) {
++                return projectCoordinate;
++            }
++        }
++        return absent();
++    }
++
++    private Optional<ProjectCoordinate> parseProjectCoordinate(InputStream inputStream, String propertiesFileName) {
++        final Properties properties = new Properties();
++        try {
++            properties.load(inputStream);
++            String groupID = parseGroupID(properties);
++            String artifactID = parseArtifactID(properties);
++            if (!groupID.equals(extractGroupID(propertiesFileName))) {
++                return absent();
++            }
++            if (!artifactID.equals(extractArtifactID(propertiesFileName))) {
++                return absent();
++            }
++            ProjectCoordinate pc = new ProjectCoordinate(groupID, artifactID, parseVersion(properties));
++            return fromNullable(pc);
++        } catch (IOException e) {
++            return absent();
++        }
++    }
++
++    private Set<ZipEntry> findPomPropertiesEntries(JarFile jarFile) {
++        Set<ZipEntry> pomEntries = Sets.newHashSet();
++        for (Enumeration<JarEntry> elements = jarFile.entries(); elements.hasMoreElements();) {
++            ZipEntry entry = elements.nextElement();
++            if (isPomPropertiesFile(entry.getName())) {
++                pomEntries.add(entry);
++            }
++        }
++        return pomEntries;
++    }
++
++    private boolean isPomPropertiesFile(String fileName) {
++        return fileName.matches(POM_PROPERTIES_FILE_REGEX);
++    }
++
++    private Optional<JarFile> readJarFileIn(File file) {
++        return jarFileConverter.createJarFile(file);
++    }
++
++    private String parseAttribute(final Properties properties, String attributeName) {
++        String value = properties.getProperty(attributeName);
++        return value;
++    }
++
++    private String parseGroupID(final Properties properties) {
++        return parseAttribute(properties, PROPERTY_KEY_GROUP_ID);
++    }
++
++    private String parseArtifactID(final Properties properties) {
++        return parseAttribute(properties, PROPERTY_KEY_ARTIFACT_ID);
++    }
++
++    private String parseVersion(final Properties properties) {
++        return parseAttribute(properties, PROPERTY_KEY_VERSION);
++    }
++
++    @Override
++    public boolean isApplicable(DependencyType dependencyType) {
++        return dependencyType == DependencyType.JAR;
++    }
++
++    public static String extractGroupID(String fileName) {
++        return extract(fileName, 3);
++    }
++
++    public static String extractArtifactID(String fileName) {
++        return extract(fileName, 2);
++    }
++
++    public static String extract(String fileName, int index) {
++        String[] split = fileName.split("/");
++        if (split.length >= 4) {
++            return split[split.length - index];
++        }
++        return "";
++    }
++
++    public interface IFileToJarFileConverter {
++        public Optional<JarFile> createJarFile(File file);
++    }
++
++    private class DefaultJarFileConverter implements IFileToJarFileConverter {
++        @Override
++        public Optional<JarFile> createJarFile(File file) {
++            try {
++                JarFile jarFile = new JarFile(file);
++                return fromNullable(jarFile);
++            } catch (IOException e) {
++                return absent();
++            }
++        }
++    }
++
++}
+diff --git a/plugins/pom.xml b/plugins/pom.xml
+index c2551cd..cf3ae1f 100644
+--- a/plugins/pom.xml
++++ b/plugins/pom.xml
+@@ -22,6 +22,7 @@
+ 		<module>org.eclipse.recommenders.completion.rcp.subwords</module>
+ 		<module>org.eclipse.recommenders.completion.rcp.sandbox</module>
+ 		<module>org.eclipse.recommenders.doc</module>
++		<module>org.eclipse.recommenders.models</module>
+ 		<module>org.eclipse.recommenders.completion.rcp.templates</module>
+ 		<module>org.eclipse.recommenders.extdoc</module>
+ 		<module>org.eclipse.recommenders.extdoc.rcp</module>
+@@ -90,4 +91,4 @@
+ 		</pluginManagement>
+ 	</build>
+ 
+-</project>
+\ No newline at end of file
++</project>
+diff --git a/tests/org.eclipse.recommenders.tests.models/.classpath b/tests/org.eclipse.recommenders.tests.models/.classpath
+new file mode 100644
+index 0000000..0b1bcf9
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/.classpath
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<classpath>
++	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
++	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
++	<classpathentry kind="src" path="src/"/>
++	<classpathentry kind="output" path="target/classes"/>
++</classpath>
+diff --git a/tests/org.eclipse.recommenders.tests.models/.project b/tests/org.eclipse.recommenders.tests.models/.project
+new file mode 100644
+index 0000000..bb9e782
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/.project
+@@ -0,0 +1,34 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<projectDescription>
++	<name>org.eclipse.recommenders.tests.models</name>
++	<comment></comment>
++	<projects>
++	</projects>
++	<buildSpec>
++		<buildCommand>
++			<name>org.eclipse.jdt.core.javabuilder</name>
++			<arguments>
++			</arguments>
++		</buildCommand>
++		<buildCommand>
++			<name>org.eclipse.pde.ManifestBuilder</name>
++			<arguments>
++			</arguments>
++		</buildCommand>
++		<buildCommand>
++			<name>org.eclipse.pde.SchemaBuilder</name>
++			<arguments>
++			</arguments>
++		</buildCommand>
++		<buildCommand>
++			<name>org.eclipse.m2e.core.maven2Builder</name>
++			<arguments>
++			</arguments>
++		</buildCommand>
++	</buildSpec>
++	<natures>
++		<nature>org.eclipse.m2e.core.maven2Nature</nature>
++		<nature>org.eclipse.pde.PluginNature</nature>
++		<nature>org.eclipse.jdt.core.javanature</nature>
++	</natures>
++</projectDescription>
+diff --git a/tests/org.eclipse.recommenders.tests.models/.settings/org.eclipse.core.resources.prefs b/tests/org.eclipse.recommenders.tests.models/.settings/org.eclipse.core.resources.prefs
+new file mode 100644
+index 0000000..99f26c0
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/.settings/org.eclipse.core.resources.prefs
+@@ -0,0 +1,2 @@
++eclipse.preferences.version=1
++encoding/<project>=UTF-8
+diff --git a/tests/org.eclipse.recommenders.tests.models/.settings/org.eclipse.jdt.core.prefs b/tests/org.eclipse.recommenders.tests.models/.settings/org.eclipse.jdt.core.prefs
+new file mode 100644
+index 0000000..c537b63
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/.settings/org.eclipse.jdt.core.prefs
+@@ -0,0 +1,7 @@
++eclipse.preferences.version=1
++org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled
++org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6
++org.eclipse.jdt.core.compiler.compliance=1.6
++org.eclipse.jdt.core.compiler.problem.assertIdentifier=error
++org.eclipse.jdt.core.compiler.problem.enumIdentifier=error
++org.eclipse.jdt.core.compiler.source=1.6
+diff --git a/tests/org.eclipse.recommenders.tests.models/.settings/org.eclipse.m2e.core.prefs b/tests/org.eclipse.recommenders.tests.models/.settings/org.eclipse.m2e.core.prefs
+new file mode 100644
+index 0000000..f897a7f
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/.settings/org.eclipse.m2e.core.prefs
+@@ -0,0 +1,4 @@
++activeProfiles=
++eclipse.preferences.version=1
++resolveWorkspaceProjects=true
++version=1
+diff --git a/tests/org.eclipse.recommenders.tests.models/META-INF/MANIFEST.MF b/tests/org.eclipse.recommenders.tests.models/META-INF/MANIFEST.MF
+new file mode 100644
+index 0000000..b7d84bd
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/META-INF/MANIFEST.MF
+@@ -0,0 +1,12 @@
++Manifest-Version: 1.0
++Bundle-ManifestVersion: 2
++Bundle-Name: Code Recommenders: Tests Model
++Bundle-SymbolicName: org.eclipse.recommenders.tests.models;singleton:=true
++Bundle-Version: 0.0.0.qualifier
++Bundle-Vendor: Eclipse Code Recommenders
++Fragment-Host: org.eclipse.recommenders.models
++Bundle-RequiredExecutionEnvironment: JavaSE-1.6
++Require-Bundle: org.junit,
++ org.hamcrest;bundle-version="1.1.0",
++ org.mockito;bundle-version="1.8.4",
++ org.eclipse.recommenders.tests
+diff --git a/tests/org.eclipse.recommenders.tests.models/build.properties b/tests/org.eclipse.recommenders.tests.models/build.properties
+new file mode 100644
+index 0000000..81951a1
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/build.properties
+@@ -0,0 +1,4 @@
++bin.includes = META-INF/,\
++               .,\
++               .
++source.. = src/
+\ No newline at end of file
+diff --git a/tests/org.eclipse.recommenders.tests.models/pom.xml b/tests/org.eclipse.recommenders.tests.models/pom.xml
+new file mode 100644
+index 0000000..b33be60
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/pom.xml
+@@ -0,0 +1,12 @@
++<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
++	<modelVersion>4.0.0</modelVersion>
++	<parent>
++		<groupId>org.eclipse.recommenders.tests</groupId>
++		<artifactId>org.eclipse.recommenders.tests.parent</artifactId>
++	        <version>1.0.3-SNAPSHOT</version>
++	</parent>
++	<artifactId>org.eclipse.recommenders.tests.models</artifactId>
++	<version>0.0.0-SNAPSHOT</version>
++	<packaging>eclipse-test-plugin</packaging>
++</project>
+diff --git a/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/FingerprintStrategyTest.java b/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/FingerprintStrategyTest.java
+new file mode 100644
+index 0000000..9f7bfbf
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/FingerprintStrategyTest.java
+@@ -0,0 +1,76 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.tests.models;
++
++import static com.google.common.base.Optional.fromNullable;
++import static org.mockito.Mockito.mock;
++import static org.mockito.Mockito.when;
++
++import java.io.File;
++import java.io.IOException;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.models.mapping.DependencyType;
++import org.eclipse.recommenders.models.mapping.impl.DependencyInfo;
++import org.eclipse.recommenders.models.mapping.impl.FingerprintStrategy;
++import org.eclipse.recommenders.models.mapping.impl.IndexUtilities;
++import org.junit.Assert;
++import org.junit.Rule;
++import org.junit.Test;
++import org.junit.rules.TemporaryFolder;
++import org.mockito.Mockito;
++
++import com.google.common.base.Optional;
++
++public class FingerprintStrategyTest {
++
++    private static final ProjectCoordinate EXPECTED_PROJECT_COORDINATE = new ProjectCoordinate("example",
++            "example.project", "1.0.0");
++
++    @Rule
++    public TemporaryFolder folder = new TemporaryFolder();
++
++    @Test
++    public void testInvalidDependencyType() {
++        FingerprintStrategy sut = new FingerprintStrategy(null);
++        sut.searchForProjectCoordinate(new DependencyInfo(null, DependencyType.PROJECT));
++    }
++
++    @Test
++    public void testValidJAR() throws IOException {
++        File jar = folder.newFile("example.jar");
++
++        IndexUtilities mockedIndexer = mock(IndexUtilities.class);
++        when(mockedIndexer.searchByFingerprint(Mockito.anyString())).thenReturn(
++                Optional.fromNullable("example:example.project:jar:1.0.0"));
++
++        FingerprintStrategy sut = new FingerprintStrategy(mockedIndexer);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(new DependencyInfo(jar,
++                DependencyType.JAR));
++
++        Assert.assertEquals(EXPECTED_PROJECT_COORDINATE, optionalProjectCoordinate.get());
++    }
++
++    @Test
++    public void testMissingInformation() throws IOException {
++        File jar = folder.newFile("example.jar");
++
++        IndexUtilities mockedIndexer = mock(IndexUtilities.class);
++        when(mockedIndexer.searchByFingerprint(Mockito.anyString())).thenReturn(fromNullable("example:1.0.0"));
++
++        FingerprintStrategy sut = new FingerprintStrategy(mockedIndexer);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(new DependencyInfo(jar,
++                DependencyType.JAR));
++
++        Assert.assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++}
+diff --git a/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/IFileToJarFileConverterMockBuilder.java b/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/IFileToJarFileConverterMockBuilder.java
+new file mode 100644
+index 0000000..19226ca
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/IFileToJarFileConverterMockBuilder.java
+@@ -0,0 +1,68 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.tests.models;
++
++import static com.google.common.base.Optional.fromNullable;
++import static org.eclipse.recommenders.utils.Throws.throwUnhandledException;
++
++import java.io.ByteArrayInputStream;
++import java.io.ByteArrayOutputStream;
++import java.io.File;
++import java.io.IOException;
++import java.util.LinkedList;
++import java.util.List;
++import java.util.Properties;
++import java.util.jar.JarFile;
++
++import org.eclipse.recommenders.models.mapping.impl.MavenPomPropertiesStrategy.IFileToJarFileConverter;
++import org.eclipse.recommenders.tests.JarFileMockBuilder;
++import org.eclipse.recommenders.utils.Tuple;
++
++import com.google.common.base.Optional;
++
++public class IFileToJarFileConverterMockBuilder {
++
++    private final List<Tuple<String, Properties>> entries = new LinkedList<Tuple<String, Properties>>();
++
++    public IFileToJarFileConverterMockBuilder put(String pomPropertiesFileName, Properties properties) {
++        entries.add(Tuple.newTuple(pomPropertiesFileName, properties));
++        return this;
++    }
++
++    private ByteArrayInputStream createInputStream(Properties properties) {
++        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
++        try {
++            properties.store(outputStream, "");
++        } catch (IOException e) {
++            throwUnhandledException(e);
++        }
++        return new ByteArrayInputStream(outputStream.toByteArray());
++    }
++
++    public IFileToJarFileConverter build() {
++        return new IFileToJarFileConverter() {
++
++            @Override
++            public Optional<JarFile> createJarFile(File file) {
++                final JarFileMockBuilder builder = new JarFileMockBuilder();
++
++                for (Tuple<String, Properties> entry : entries) {
++                    builder.addEntry(entry.getFirst(), createInputStream(entry.getSecond()));
++                }
++                return fromNullable(builder.build());
++            }
++        };
++    }
++
++    public static IFileToJarFileConverter createEmptyIFileToJarFileConverter() {
++        return (new IFileToJarFileConverterMockBuilder()).build();
++    }
++}
+diff --git a/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/JREIDEVersionStrategyTest.java b/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/JREIDEVersionStrategyTest.java
+new file mode 100644
+index 0000000..f5dadaa
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/JREIDEVersionStrategyTest.java
+@@ -0,0 +1,70 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.tests.models;
++
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertFalse;
++
++import java.io.File;
++import java.util.Map;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.models.mapping.DependencyType;
++import org.eclipse.recommenders.models.mapping.IDependencyInfo;
++import org.eclipse.recommenders.models.mapping.IMappingStrategy;
++import org.eclipse.recommenders.models.mapping.impl.DependencyInfo;
++import org.eclipse.recommenders.models.mapping.impl.JREIDEVersionStrategy;
++import org.junit.Test;
++
++import com.google.common.base.Optional;
++import com.google.common.collect.Maps;
++
++public class JREIDEVersionStrategyTest {
++
++    private static final File JAVA_HOME_FOLDER = new File("JAVA_HOME/");
++    private static final ProjectCoordinate EXPECTED_PROJECT_COORDINATE = new ProjectCoordinate("jre", "jre", "1.0.0");
++
++    private static Map<String, String> createAttributesMapForVersion(String version) {
++        Map<String, String> attributes = Maps.newHashMap();
++        attributes.put(DependencyInfo.JRE_VERSION_IDE, version);
++        return attributes;
++    }
++
++    @Test
++    public void testNotSupportedType() {
++        IDependencyInfo info = new DependencyInfo(JAVA_HOME_FOLDER, DependencyType.JAR);
++        IMappingStrategy sut = new JREIDEVersionStrategy();
++
++        sut.searchForProjectCoordinate(info);
++    }
++
++    @Test
++    public void testMissingInformation() {
++        IDependencyInfo info = new DependencyInfo(JAVA_HOME_FOLDER, DependencyType.JRE);
++        IMappingStrategy sut = new JREIDEVersionStrategy();
++
++        Optional<ProjectCoordinate> extractProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertFalse(extractProjectCoordinate.isPresent());
++    }
++
++    @Test
++    public void testValidJRE() {
++        IDependencyInfo info = new DependencyInfo(JAVA_HOME_FOLDER, DependencyType.JRE,
++                createAttributesMapForVersion("1.0.0"));
++        IMappingStrategy sut = new JREIDEVersionStrategy();
++
++        Optional<ProjectCoordinate> projectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertEquals(EXPECTED_PROJECT_COORDINATE, projectCoordinate.get());
++    }
++
++}
+diff --git a/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/JREReleaseFileStrategyTest.java b/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/JREReleaseFileStrategyTest.java
+new file mode 100644
+index 0000000..cf82cb4
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/JREReleaseFileStrategyTest.java
+@@ -0,0 +1,116 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.tests.models;
++
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertFalse;
++
++import java.io.BufferedWriter;
++import java.io.File;
++import java.io.FileWriter;
++import java.io.IOException;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.models.mapping.DependencyType;
++import org.eclipse.recommenders.models.mapping.IDependencyInfo;
++import org.eclipse.recommenders.models.mapping.IMappingStrategy;
++import org.eclipse.recommenders.models.mapping.impl.DependencyInfo;
++import org.eclipse.recommenders.models.mapping.impl.JREReleaseFileStrategy;
++import org.junit.Rule;
++import org.junit.Test;
++import org.junit.rules.TemporaryFolder;
++
++import com.google.common.base.Optional;
++
++public class JREReleaseFileStrategyTest {
++
++    private static final ProjectCoordinate EXPECTED_PROJECT_COORDINATE = new ProjectCoordinate("jre", "jre", "1.0.0");
++
++    @Rule
++    public TemporaryFolder folder = new TemporaryFolder();
++
++    private File javaHomeDirectory;
++    private File releaseFile;
++
++    private void createJavaHomeDirectory() {
++        javaHomeDirectory = folder.newFolder("JAVA_HOME");
++    }
++
++    private void createReleaseFile() throws IOException {
++        releaseFile = folder.newFile("JAVA_HOME" + File.separator + "release");
++    }
++
++    private void fillReleaseFileWithVersion() throws IOException {
++        BufferedWriter writer = new BufferedWriter(new FileWriter(releaseFile, true));
++        writer.write("JAVA_VERSION=\"1.0.0\"\n");
++        writer.close();
++    }
++
++    private void fillReleaseFileWithOtherStuff() throws IOException {
++        BufferedWriter writer = new BufferedWriter(new FileWriter(releaseFile, true));
++        writer.write("OS_NAME=\"Windows\"\n");
++        writer.write("OS_VERSION=\"5.2\"\n");
++        writer.write("OS_ARCH=\"amd64\"\n");
++        writer.close();
++    }
++
++    @Test
++    public void testInvalidType() {
++        IDependencyInfo info = new DependencyInfo(new File(""), DependencyType.JAR);
++        IMappingStrategy sut = new JREReleaseFileStrategy();
++
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++    @Test
++    public void testValidReleaseFile() throws IOException {
++        createJavaHomeDirectory();
++        createReleaseFile();
++        fillReleaseFileWithVersion();
++        fillReleaseFileWithOtherStuff();
++
++        IDependencyInfo info = new DependencyInfo(javaHomeDirectory, DependencyType.JRE);
++        IMappingStrategy sut = new JREReleaseFileStrategy();
++
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertEquals(EXPECTED_PROJECT_COORDINATE, optionalProjectCoordinate.get());
++    }
++
++    @Test
++    public void testReleaseFileWithoutVersion() throws IOException {
++        createJavaHomeDirectory();
++        createReleaseFile();
++        fillReleaseFileWithOtherStuff();
++
++        IDependencyInfo info = new DependencyInfo(javaHomeDirectory, DependencyType.JRE);
++        IMappingStrategy sut = new JREReleaseFileStrategy();
++
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++    @Test
++    public void testMissingReleaseFile() {
++        createJavaHomeDirectory();
++
++        IDependencyInfo info = new DependencyInfo(javaHomeDirectory, DependencyType.JRE);
++        IMappingStrategy sut = new JREReleaseFileStrategy();
++
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++}
+diff --git a/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/MappingProviderTest.java b/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/MappingProviderTest.java
+new file mode 100644
+index 0000000..ad51865
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/MappingProviderTest.java
+@@ -0,0 +1,166 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.tests.models;
++
++import static com.google.common.base.Optional.fromNullable;
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertFalse;
++import static org.junit.Assert.assertTrue;
++
++import java.io.File;
++import java.util.List;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.models.mapping.DependencyType;
++import org.eclipse.recommenders.models.mapping.IDependencyInfo;
++import org.eclipse.recommenders.models.mapping.IMappingProvider;
++import org.eclipse.recommenders.models.mapping.IMappingStrategy;
++import org.eclipse.recommenders.models.mapping.impl.DependencyInfo;
++import org.eclipse.recommenders.models.mapping.impl.MappingProvider;
++import org.junit.Test;
++import org.mockito.Mockito;
++
++import com.google.common.base.Optional;
++import com.google.common.cache.CacheStats;
++import com.google.common.collect.Lists;
++
++public class MappingProviderTest {
++
++    private final static ProjectCoordinate EXPECTED_PROJECT_COORDINATE = new ProjectCoordinate("example",
++            "example.project", "1.0.0");
++    private final static ProjectCoordinate ANOTHER_EXPECTED_PROJECT_COORDINATE = new ProjectCoordinate(
++            "another.example", "another.example.project", "1.2.3");
++
++    private IMappingStrategy createMockedStrategy(ProjectCoordinate projectCoordinate,
++            DependencyType... dependencyTypes) {
++        IMappingStrategy mockedStrategy = Mockito.mock(IMappingStrategy.class);
++        Mockito.when(mockedStrategy.searchForProjectCoordinate(Mockito.any(IDependencyInfo.class))).thenReturn(
++                fromNullable(projectCoordinate));
++        Mockito.when(mockedStrategy.isApplicable(Mockito.any(DependencyType.class))).thenReturn(false);
++        for (DependencyType dependencyType : dependencyTypes) {
++            Mockito.when(mockedStrategy.isApplicable(dependencyType)).thenReturn(true);
++        }
++        return mockedStrategy;
++    }
++
++    @Test
++    public void testMappingProviderWithNoStrategy() {
++        IMappingProvider sut = new MappingProvider();
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(new DependencyInfo(
++                new File("example.jar"), DependencyType.JAR));
++
++        assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++    @Test
++    public void testValidJRE() {
++        IMappingProvider sut = new MappingProvider();
++        sut.addStrategy(createMockedStrategy(EXPECTED_PROJECT_COORDINATE));
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(new DependencyInfo(
++                new File("example.jar"), DependencyType.JAR));
++
++        assertEquals(EXPECTED_PROJECT_COORDINATE, optionalProjectCoordinate.get());
++    }
++
++    @Test
++    public void testCorrectOrderOfStrategiesWithAddStrategies() {
++        IMappingProvider sut = new MappingProvider();
++        sut.addStrategy(createMockedStrategy(EXPECTED_PROJECT_COORDINATE));
++        sut.addStrategy(createMockedStrategy(ANOTHER_EXPECTED_PROJECT_COORDINATE));
++
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(new DependencyInfo(
++                new File("example.jar"), DependencyType.JAR));
++
++        assertEquals(EXPECTED_PROJECT_COORDINATE, optionalProjectCoordinate.get());
++    }
++
++    @Test
++    public void testSetStrategiesSetStrategiesCorrect() {
++        IMappingProvider sut = new MappingProvider();
++
++        List<IMappingStrategy> strategies = Lists.newArrayList();
++        strategies.add(createMockedStrategy(EXPECTED_PROJECT_COORDINATE));
++        strategies.add(createMockedStrategy(ANOTHER_EXPECTED_PROJECT_COORDINATE));
++        sut.setStrategy(strategies);
++
++        assertEquals(strategies, sut.getStrategies());
++    }
++
++    @Test
++    public void testIsApplicableWithoutStrategies() {
++        IMappingProvider sut = new MappingProvider();
++        assertFalse(sut.isApplicable(DependencyType.JAR));
++    }
++
++    @Test
++    public void testIsApplicableWithStrategies() {
++        IMappingProvider sut = new MappingProvider();
++        sut.addStrategy(createMockedStrategy(ProjectCoordinate.UNKNOWN, DependencyType.JRE));
++        sut.addStrategy(createMockedStrategy(ProjectCoordinate.UNKNOWN, DependencyType.JAR));
++        assertTrue(sut.isApplicable(DependencyType.JAR));
++    }
++
++    @Test
++    public void testCorrectOrderOfStrategiesWithSetStrategies() {
++        IMappingProvider sut = new MappingProvider();
++
++        List<IMappingStrategy> strategies = Lists.newArrayList();
++        strategies.add(createMockedStrategy(EXPECTED_PROJECT_COORDINATE));
++        strategies.add(createMockedStrategy(ANOTHER_EXPECTED_PROJECT_COORDINATE));
++        sut.setStrategy(strategies);
++
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(new DependencyInfo(
++                new File("example.jar"), DependencyType.JAR));
++
++        assertEquals(EXPECTED_PROJECT_COORDINATE, optionalProjectCoordinate.get());
++    }
++
++    @Test
++    public void testSecondStrategyWins() {
++        IMappingProvider sut = new MappingProvider();
++
++        List<IMappingStrategy> strategies = Lists.newArrayList();
++        strategies.add(createMockedStrategy(null));
++        strategies.add(createMockedStrategy(EXPECTED_PROJECT_COORDINATE));
++        sut.setStrategy(strategies);
++
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(new DependencyInfo(
++                new File("example.jar"), DependencyType.JAR));
++
++        assertEquals(EXPECTED_PROJECT_COORDINATE, optionalProjectCoordinate.get());
++    }
++
++    @Test
++    public void testMappingCacheMissAtFirstTime() {
++        MappingProvider sut = new MappingProvider();
++        sut.addStrategy(createMockedStrategy(EXPECTED_PROJECT_COORDINATE));
++        DependencyInfo dependencyInfo = new DependencyInfo(new File("example.jar"), DependencyType.JAR);
++        sut.searchForProjectCoordinate(dependencyInfo);
++
++        CacheStats cacheStats = sut.getCacheStats().get();
++
++        assertEquals(1, cacheStats.missCount());
++    }
++
++    @Test
++    public void testMappingCacheHitAtSecondTime() {
++        MappingProvider sut = new MappingProvider();
++        sut.addStrategy(createMockedStrategy(EXPECTED_PROJECT_COORDINATE));
++        DependencyInfo dependencyInfo = new DependencyInfo(new File("example.jar"), DependencyType.JAR);
++        sut.searchForProjectCoordinate(dependencyInfo);
++        sut.searchForProjectCoordinate(dependencyInfo);
++
++        CacheStats cacheStats = sut.getCacheStats().get();
++
++        assertEquals(1, cacheStats.hitCount());
++    }
++
++}
+diff --git a/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/MavenPomPropertiesStrategyTest.java b/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/MavenPomPropertiesStrategyTest.java
+new file mode 100644
+index 0000000..a127062
+--- /dev/null
++++ b/tests/org.eclipse.recommenders.tests.models/src/org/eclipse/recommenders/tests/models/MavenPomPropertiesStrategyTest.java
+@@ -0,0 +1,230 @@
++/**
++ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
++ * All rights reserved. This program and the accompanying materials
++ * are made available under the terms of the Eclipse Public License v1.0
++ * which accompanies this distribution, and is available at
++ * http://www.eclipse.org/legal/epl-v10.html
++ *
++ * Contributors:
++ *     Olav Lenz - initial API and implementation
++ */
++package org.eclipse.recommenders.tests.models;
++
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertFalse;
++
++import java.io.File;
++import java.util.Properties;
++
++import org.eclipse.recommenders.models.ProjectCoordinate;
++import org.eclipse.recommenders.models.mapping.DependencyType;
++import org.eclipse.recommenders.models.mapping.IDependencyInfo;
++import org.eclipse.recommenders.models.mapping.IMappingStrategy;
++import org.eclipse.recommenders.models.mapping.impl.DependencyInfo;
++import org.eclipse.recommenders.models.mapping.impl.MavenPomPropertiesStrategy;
++import org.eclipse.recommenders.models.mapping.impl.MavenPomPropertiesStrategy.IFileToJarFileConverter;
++import org.junit.Test;
++
++import com.google.common.base.Optional;
++
++public class MavenPomPropertiesStrategyTest {
++
++    private static final File JAR_FILE_EXAMPLE = new File("example.jar");
++    private static final Properties INPUT_PROPERTIES = createProperties("org.example", "example", "1.0.0");
++    private static final ProjectCoordinate EXPECTED_PROJECT_COORDINATE = new ProjectCoordinate("org.example",
++            "example", "1.0.0");
++
++    private static Properties createProperties(final String groupId, final String artifactId, final String version) {
++        Properties properties = new Properties();
++        properties.put(MavenPomPropertiesStrategy.PROPERTY_KEY_GROUP_ID, groupId);
++        properties.put(MavenPomPropertiesStrategy.PROPERTY_KEY_ARTIFACT_ID, artifactId);
++        properties.put(MavenPomPropertiesStrategy.PROPERTY_KEY_VERSION, version);
++        return properties;
++    }
++
++    private IFileToJarFileConverter createIFileToJarFileConverter(final String propertiesFileName,
++            final Properties properties) {
++        return (new IFileToJarFileConverterMockBuilder()).put(propertiesFileName, properties).build();
++    }
++
++    @Test
++    public void testValidPomProperties() {
++        final String propertiesFileName = "META-INF/maven/org.example/example/pom.properties";
++
++        IFileToJarFileConverter fileToJarFileConverter = createIFileToJarFileConverter(propertiesFileName,
++                INPUT_PROPERTIES);
++
++        IDependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
++
++        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertEquals(EXPECTED_PROJECT_COORDINATE, optionalProjectCoordinate.get());
++    }
++
++    @Test
++    public void testValidPomPropertiesInWrongDirectoryStructure() {
++        final String propertiesFileName = "pom.properties";
++
++        IFileToJarFileConverter fileToJarFileConverter = createIFileToJarFileConverter(propertiesFileName,
++                INPUT_PROPERTIES);
++
++        IDependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
++
++        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++    @Test
++    public void testValidPomPropertiesNotLocatedInMetaInfDirectory() {
++        final String propertiesFileName = "maven/org.example/example/pom.properties";
++
++        IFileToJarFileConverter fileToJarFileConverter = createIFileToJarFileConverter(propertiesFileName,
++                INPUT_PROPERTIES);
++
++        IDependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
++
++        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++    @Test
++    public void testValidPomPropertiesInWrongDirectory() {
++        final String propertiesFileName = "nested/META-INF/maven/org.eclipse.group/org.eclipse.artifact/pom.properties";
++
++        IFileToJarFileConverter fileToJarFileConverter = createIFileToJarFileConverter(propertiesFileName,
++                INPUT_PROPERTIES);
++
++        IDependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
++
++        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++    @Test
++    public void testValidPomPropertiesMavenDirectoryMissing() {
++        final String propertiesFileName = "META-INF/org.example/example/pom.properties";
++
++        IFileToJarFileConverter fileToJarFileConverter = createIFileToJarFileConverter(propertiesFileName,
++                INPUT_PROPERTIES);
++
++        IDependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
++
++        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++    @Test
++    public void testInvalidFileNameEnding() {
++        final String propertiesFileName = "META-INF/maven/org.example/example/pom.invalid";
++
++        IFileToJarFileConverter fileToJarFileConverter = createIFileToJarFileConverter(propertiesFileName,
++                INPUT_PROPERTIES);
++
++        IDependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
++
++        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++    @Test
++    public void testInvalidArtifactIdInPomPropertiesFileName() {
++
++        final String propertiesFileName = "META-INF/maven/org.example/invalid/pom.properties";
++
++        IFileToJarFileConverter fileToJarFileConverter = createIFileToJarFileConverter(propertiesFileName,
++                INPUT_PROPERTIES);
++
++        IDependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
++
++        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++    @Test
++    public void testInvalidArtifactIdAndGroudIdInFileName() {
++        final String propertiesFileName = "META-INF/maven/invalid/example/pom.properties";
++
++        IFileToJarFileConverter fileToJarFileConverter = createIFileToJarFileConverter(propertiesFileName,
++                INPUT_PROPERTIES);
++
++        IDependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
++
++        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++    @Test
++    public void testNotApplicableTyp() {
++        final String propertiesFileName = "META-INF/maven/org.example/example/pom.properties";
++
++        IFileToJarFileConverter fileToJarFileConverter = createIFileToJarFileConverter(propertiesFileName,
++                INPUT_PROPERTIES);
++
++        IDependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.PROJECT);
++
++        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++    @Test
++    public void testApplicabaleTypButNoFile() {
++        IFileToJarFileConverter fileToJarFileConverter = IFileToJarFileConverterMockBuilder.createEmptyIFileToJarFileConverter();
++
++        IDependencyInfo info = new DependencyInfo(new File(""), DependencyType.JAR);
++
++        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertFalse(optionalProjectCoordinate.isPresent());
++    }
++
++    @Test
++    public void testJarContainMoreOneCorrectAndOneWrongPomPropertiesFindCorrectOneFirst() {
++        final String propertiesFileName1 = "META-INF/maven/org.example/example/pom.properties";
++        final String propertiesFileName2 = "META-INF/maven/org.example/invalid/pom.properties";
++
++        IFileToJarFileConverter fileToJarFileConverter = (new IFileToJarFileConverterMockBuilder())
++                .put(propertiesFileName2, INPUT_PROPERTIES).put(propertiesFileName1, INPUT_PROPERTIES).build();
++
++        IDependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
++
++        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertEquals(EXPECTED_PROJECT_COORDINATE, optionalProjectCoordinate.get());
++    }
++
++    @Test
++    public void testJarContainMoreOneCorrectAndOneWrongPomPropertiesFindWrongOneFirst() {
++        final String propertiesFileName1 = "META-INF/maven/org.example/invalid/pom.properties";
++        final String propertiesFileName2 = "META-INF/maven/org.example/example/pom.properties";
++
++        IFileToJarFileConverter fileToJarFileConverter = (new IFileToJarFileConverterMockBuilder())
++                .put(propertiesFileName1, INPUT_PROPERTIES).put(propertiesFileName2, INPUT_PROPERTIES).build();
++
++        IDependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
++
++        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
++        Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
++
++        assertEquals(EXPECTED_PROJECT_COORDINATE, optionalProjectCoordinate.get());
++    }
++
++}
+diff --git a/tests/org.eclipse.recommenders.tests.util/META-INF/MANIFEST.MF b/tests/org.eclipse.recommenders.tests.util/META-INF/MANIFEST.MF
+index 0f1084b..2814596 100644
+--- a/tests/org.eclipse.recommenders.tests.util/META-INF/MANIFEST.MF
++++ b/tests/org.eclipse.recommenders.tests.util/META-INF/MANIFEST.MF
+@@ -4,7 +4,8 @@ Bundle-Name: Code Recommenders: Commons Test Utils
+ Bundle-SymbolicName: org.eclipse.recommenders.tests.util
+ Bundle-Version: 1.0.3.qualifier
+ Bundle-Vendor: Eclipse Code Recommenders
+-Export-Package: org.eclipse.recommenders.utils,
++Export-Package: org.eclipse.recommenders.tests.internal.analysis.archive,
++ org.eclipse.recommenders.utils,
+  org.eclipse.recommenders.utils.gson,
+  org.eclipse.recommenders.utils.names
+ Require-Bundle: org.eclipse.recommenders.tests,
+diff --git a/tests/pom.xml b/tests/pom.xml
+index 65aed1a..39d51ed 100644
+--- a/tests/pom.xml
++++ b/tests/pom.xml
+@@ -17,6 +17,7 @@
+ 		<module>org.eclipse.recommenders.tests.rdk</module>
+ 		<module>org.eclipse.recommenders.tests.rcp</module>
+ 		<module>org.eclipse.recommenders.tests.util</module>
++		<module>org.eclipse.recommenders.tests.models</module>
+ 		<!--module>org.eclipse.recommenders.tests.webclient</module-->
+ 		<!--module>org.eclipse.recommenders.tests.ui</module-->
+ 		<!--module>org.eclipse.recommenders.tests.snipmatch.rcp</module-->
+-- 
+1.7.12.4 (Apple Git-37)
+

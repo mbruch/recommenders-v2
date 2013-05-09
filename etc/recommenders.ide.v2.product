@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product id="org.eclipse.sdk.ide" application="org.eclipse.ui.ide.workbench" useFeatures="true" includeLaunchers="true">
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+   </launcherArgs>
+
+   <launcher>
+      <solaris/>
+      <win useIco="false">
+         <bmp/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <plugins>
+   </plugins>
+
+   <features>
+      <feature id="org.eclipse.recommenders.feature.rcp.core"/>
+      <feature id="org.eclipse.recommenders.feature.models.rcp"/>
+      <feature id="org.eclipse.recommenders.feature.jayes"/>
+      <feature id="org.eclipse.recommenders.feature.calls.rcp"/>
+      <feature id="org.eclipse.recommenders.feature.3rd.orbit"/>
+      <feature id="org.eclipse.recommenders.feature.3rd.rcp.nonorbit"/>
+      <feature id="org.eclipse.pde"/>
+      <feature id="org.eclipse.sdk"/>
+      <feature id="org.eclipse.emf.common"/>
+      <feature id="org.eclipse.emf.ecore"/>
+      <feature id="org.eclipse.equinox.p2.extras.feature"/>
+      <feature id="org.eclipse.recommenders.feature.rcp"/>
+      <feature id="org.eclipse.e4.rcp"/>
+      <feature id="org.eclipse.jdt"/>
+   </features>
+
+
+</product>
