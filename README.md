@@ -1,4 +1,4 @@
 recommenders-v2
 ===============
 
-recommenders-dev
+temporary git repository for sketching recommenders 2.0 APIs
