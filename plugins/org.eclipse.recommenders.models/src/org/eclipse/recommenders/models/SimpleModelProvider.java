@@ -16,9 +16,9 @@ import java.util.zip.ZipFile;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import com.google.common.base.Optional;
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import com.google.common.reflect.Reflection;
@@ -30,7 +30,7 @@ import com.google.common.reflect.Reflection;
  */
 public abstract class SimpleModelProvider<K extends IBasedName<?>, M> implements IModelProvider<K, M> {
 
-    protected final Cache<ModelArchiveCoordinate, ZipFile> openZips = CacheBuilder.newBuilder()
+    protected final LoadingCache<ModelArchiveCoordinate, ZipFile> openZips = CacheBuilder.newBuilder()
             .maximumSize(10)
             .expireAfterAccess(1, MINUTES)
             .removalListener(new ZipRemovalListener())

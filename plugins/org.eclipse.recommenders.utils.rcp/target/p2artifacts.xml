@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?artifactRepository version='1.1.0'?>
+<artifacts size='2'>
+  <artifact classifier='osgi.bundle' id='org.eclipse.recommenders.utils.rcp' version='1.0.3.v20130412-1928-b000'>
+    <properties size='5'>
+      <property name='artifact.size' value='59937'/>
+      <property name='download.size' value='59937'/>
+      <property name='maven-groupId' value='org.eclipse.recommenders.plugin'/>
+      <property name='maven-artifactId' value='org.eclipse.recommenders.utils.rcp'/>
+      <property name='maven-version' value='1.0.3-SNAPSHOT'/>
+    </properties>
+  </artifact>
+  <artifact classifier='osgi.bundle' id='org.eclipse.recommenders.utils.rcp.source' version='1.0.3.v20130412-1928-b000'>
+    <properties size='6'>
+      <property name='artifact.size' value='33839'/>
+      <property name='download.size' value='33839'/>
+      <property name='maven-groupId' value='org.eclipse.recommenders.plugin'/>
+      <property name='maven-artifactId' value='org.eclipse.recommenders.utils.rcp'/>
+      <property name='maven-version' value='1.0.3-SNAPSHOT'/>
+      <property name='maven-classifier' value='sources'/>
+    </properties>
+  </artifact>
+</artifacts>

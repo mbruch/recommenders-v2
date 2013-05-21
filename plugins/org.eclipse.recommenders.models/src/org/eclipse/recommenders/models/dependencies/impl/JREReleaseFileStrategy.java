@@ -21,8 +21,8 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.eclipse.recommenders.models.ProjectCoordinate;
+import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
-import org.eclipse.recommenders.models.dependencies.IDependencyInfo;
 import org.eclipse.recommenders.utils.IOUtils;
 
 import com.google.common.base.Optional;
@@ -30,7 +30,7 @@ import com.google.common.base.Optional;
 public class JREReleaseFileStrategy extends AbstractStrategy {
 
     @Override
-    protected Optional<ProjectCoordinate> extractProjectCoordinateInternal(IDependencyInfo dependencyInfo) {
+    protected Optional<ProjectCoordinate> extractProjectCoordinateInternal(DependencyInfo dependencyInfo) {
         Optional<FileInputStream> optionalReleaseFileInputStream = readReleaseFileIn(dependencyInfo.getFile());
         if (!optionalReleaseFileInputStream.isPresent()) {
             return absent();

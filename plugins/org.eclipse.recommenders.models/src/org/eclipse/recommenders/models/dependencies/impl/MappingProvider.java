@@ -10,13 +10,14 @@
  */
 package org.eclipse.recommenders.models.dependencies.impl;
 
-import static com.google.common.base.Optional.*;
+import static com.google.common.base.Optional.absent;
+import static com.google.common.base.Optional.fromNullable;
 
 import java.util.List;
 
 import org.eclipse.recommenders.models.ProjectCoordinate;
-import org.eclipse.recommenders.models.dependencies.DependencyType;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
+import org.eclipse.recommenders.models.dependencies.DependencyType;
 import org.eclipse.recommenders.models.dependencies.IMappingProvider;
 import org.eclipse.recommenders.models.dependencies.IMappingStrategy;
 import org.eclipse.recommenders.utils.annotations.Testing;
@@ -25,6 +26,7 @@ import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheStats;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 
 public class MappingProvider implements IMappingProvider {

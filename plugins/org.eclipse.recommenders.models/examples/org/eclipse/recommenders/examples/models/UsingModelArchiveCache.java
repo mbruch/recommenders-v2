@@ -6,7 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.recommenders.models.ModelArchiveCoordinate;
 import org.eclipse.recommenders.models.ModelRepository;
-import org.eclipse.recommenders.models.ModelRepositoryEvents;
+import org.eclipse.recommenders.models.ModelRepository.ModelRepositoryEvents;
 import org.eclipse.recommenders.models.ProjectCoordinate;
 
 import com.google.common.collect.HashBasedTable;
@@ -40,7 +40,7 @@ public class UsingModelArchiveCache {
         Table<ProjectCoordinate, String, Pair<ModelArchiveCoordinate, Boolean>> mappings = HashBasedTable.create();
         for (ProjectCoordinate projectCoord : gavs) {
             for (IModelArchiveCoordinateProvider modelProvider : modelProviders) {
-                ModelArchiveCoordinate modelCoord = modelProvider.get(projectCoord).orNull();
+                ModelArchiveCoordinate modelCoord = modelProvider.find(projectCoord).orNull();
                 if (modelCoord != null) {
                     boolean cached = cache.isCached(modelCoord);
                     mappings.put(projectCoord, modelProvider.getType(), Pair.of(modelCoord, cached));

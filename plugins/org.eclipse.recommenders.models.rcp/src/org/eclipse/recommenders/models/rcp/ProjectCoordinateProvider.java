@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
-import org.eclipse.recommenders.models.dependencies.IDependencyInfo;
+
 import com.google.common.base.Optional;
 
 public class ProjectCoordinateProvider {
@@ -73,7 +73,7 @@ public class ProjectCoordinateProvider {
         return resolve(request);
     }
 
-    public Optional<ProjectCoordinate> resolve(IDependencyInfo info) {
+    public Optional<ProjectCoordinate> resolve(DependencyInfo info) {
         // TODO Mapping strategies... do some magic!
         return of(ProjectCoordinate.UNKNOWN);
     }

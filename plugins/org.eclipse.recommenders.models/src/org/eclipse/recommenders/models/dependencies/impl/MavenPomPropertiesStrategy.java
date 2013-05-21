@@ -24,11 +24,10 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 import org.eclipse.recommenders.models.ProjectCoordinate;
+import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
-import org.eclipse.recommenders.models.dependencies.IDependencyInfo;
 import org.eclipse.recommenders.utils.IOUtils;
 import org.eclipse.recommenders.utils.annotations.Testing;
-import org.eclipse.recommenders.utils.archive.MavenPomJarIdExtractor;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
@@ -38,151 +37,159 @@ import com.google.common.collect.Sets;
  */
 public class MavenPomPropertiesStrategy extends AbstractStrategy {
 
-    private static final String POM_PROPERTIES_FILE_REGEX = "META-INF/maven/.*/.*/pom.properties";
-    public static final String PROPERTY_KEY_VERSION = "version";
-    public static final String PROPERTY_KEY_ARTIFACT_ID = "artifactId";
-    public static final String PROPERTY_KEY_GROUP_ID = "groupId";
+	private static final String POM_PROPERTIES_FILE_REGEX = "META-INF/maven/.*/.*/pom.properties";
+	public static final String PROPERTY_KEY_VERSION = "version";
+	public static final String PROPERTY_KEY_ARTIFACT_ID = "artifactId";
+	public static final String PROPERTY_KEY_GROUP_ID = "groupId";
 
-    private final IFileToJarFileConverter jarFileConverter;
+	private final IFileToJarFileConverter jarFileConverter;
 
-    public MavenPomPropertiesStrategy() {
-        this.jarFileConverter = new DefaultJarFileConverter();
-    }
+	public MavenPomPropertiesStrategy() {
+		this.jarFileConverter = new DefaultJarFileConverter();
+	}
 
-    @Testing
-    public MavenPomPropertiesStrategy(IFileToJarFileConverter fileToJarFileConverter) {
-        this.jarFileConverter = fileToJarFileConverter;
-    }
+	@Testing
+	public MavenPomPropertiesStrategy(
+			IFileToJarFileConverter fileToJarFileConverter) {
+		this.jarFileConverter = fileToJarFileConverter;
+	}
 
-    @Override
-    protected Optional<ProjectCoordinate> extractProjectCoordinateInternal(IDependencyInfo dependencyInfo) {
-        Optional<JarFile> optionalJarFile = readJarFileIn(dependencyInfo.getFile());
-        if (!optionalJarFile.isPresent()) {
-            return absent();
-        }
-        JarFile jarFile = optionalJarFile.get();
-        try {
-            return extractProjectCoordinateOfJarFile(jarFile);
-        } catch (IOException e) {
-            return absent();
-        } finally {
-            close(jarFile);
-        }
-    }
+	@Override
+	protected Optional<ProjectCoordinate> extractProjectCoordinateInternal(
+			DependencyInfo dependencyInfo) {
+		Optional<JarFile> optionalJarFile = readJarFileIn(dependencyInfo
+				.getFile());
+		if (!optionalJarFile.isPresent()) {
+			return absent();
+		}
+		JarFile jarFile = optionalJarFile.get();
+		try {
+			return extractProjectCoordinateOfJarFile(jarFile);
+		} catch (IOException e) {
+			return absent();
+		} finally {
+			close(jarFile);
+		}
+	}
 
-    private void close(JarFile jarFile) {
-        try {
-            jarFile.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+	private void close(JarFile jarFile) {
+		try {
+			jarFile.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-    private Optional<ProjectCoordinate> extractProjectCoordinateOfJarFile(JarFile jarFile) throws IOException {
-        Set<ZipEntry> pomZipEntries = findPomPropertiesEntries(jarFile);
-        for (ZipEntry zipEntry : pomZipEntries) {
-            InputStream pomPropertiesInputStream;
-            pomPropertiesInputStream = jarFile.getInputStream(zipEntry);
-            Optional<ProjectCoordinate> projectCoordinate = parseProjectCoordinate(pomPropertiesInputStream,
-                    zipEntry.getName());
-            IOUtils.closeQuietly(pomPropertiesInputStream);
-            if (projectCoordinate.isPresent()) {
-                return projectCoordinate;
-            }
-        }
-        return absent();
-    }
+	private Optional<ProjectCoordinate> extractProjectCoordinateOfJarFile(
+			JarFile jarFile) throws IOException {
+		Set<ZipEntry> pomZipEntries = findPomPropertiesEntries(jarFile);
+		for (ZipEntry zipEntry : pomZipEntries) {
+			InputStream pomPropertiesInputStream;
+			pomPropertiesInputStream = jarFile.getInputStream(zipEntry);
+			Optional<ProjectCoordinate> projectCoordinate = parseProjectCoordinate(
+					pomPropertiesInputStream, zipEntry.getName());
+			IOUtils.closeQuietly(pomPropertiesInputStream);
+			if (projectCoordinate.isPresent()) {
+				return projectCoordinate;
+			}
+		}
+		return absent();
+	}
 
-    private Optional<ProjectCoordinate> parseProjectCoordinate(InputStream inputStream, String propertiesFileName) {
-        final Properties properties = new Properties();
-        try {
-            properties.load(inputStream);
-            String groupID = parseGroupID(properties);
-            String artifactID = parseArtifactID(properties);
-            if (!groupID.equals(extractGroupID(propertiesFileName))) {
-                return absent();
-            }
-            if (!artifactID.equals(extractArtifactID(propertiesFileName))) {
-                return absent();
-            }
-            ProjectCoordinate pc = new ProjectCoordinate(groupID, artifactID, parseVersion(properties));
-            return fromNullable(pc);
-        } catch (IOException e) {
-            return absent();
-        }
-    }
+	private Optional<ProjectCoordinate> parseProjectCoordinate(
+			InputStream inputStream, String propertiesFileName) {
+		final Properties properties = new Properties();
+		try {
+			properties.load(inputStream);
+			String groupID = parseGroupID(properties);
+			String artifactID = parseArtifactID(properties);
+			if (!groupID.equals(extractGroupID(propertiesFileName))) {
+				return absent();
+			}
+			if (!artifactID.equals(extractArtifactID(propertiesFileName))) {
+				return absent();
+			}
+			ProjectCoordinate pc = new ProjectCoordinate(groupID, artifactID,
+					parseVersion(properties));
+			return fromNullable(pc);
+		} catch (IOException e) {
+			return absent();
+		}
+	}
 
-    private Set<ZipEntry> findPomPropertiesEntries(JarFile jarFile) {
-        Set<ZipEntry> pomEntries = Sets.newHashSet();
-        for (Enumeration<JarEntry> elements = jarFile.entries(); elements.hasMoreElements();) {
-            ZipEntry entry = elements.nextElement();
-            if (isPomPropertiesFile(entry.getName())) {
-                pomEntries.add(entry);
-            }
-        }
-        return pomEntries;
-    }
+	private Set<ZipEntry> findPomPropertiesEntries(JarFile jarFile) {
+		Set<ZipEntry> pomEntries = Sets.newHashSet();
+		for (Enumeration<JarEntry> elements = jarFile.entries(); elements
+				.hasMoreElements();) {
+			ZipEntry entry = elements.nextElement();
+			if (isPomPropertiesFile(entry.getName())) {
+				pomEntries.add(entry);
+			}
+		}
+		return pomEntries;
+	}
 
-    private boolean isPomPropertiesFile(String fileName) {
-        return fileName.matches(POM_PROPERTIES_FILE_REGEX);
-    }
+	private boolean isPomPropertiesFile(String fileName) {
+		return fileName.matches(POM_PROPERTIES_FILE_REGEX);
+	}
 
-    private Optional<JarFile> readJarFileIn(File file) {
-        return jarFileConverter.createJarFile(file);
-    }
+	private Optional<JarFile> readJarFileIn(File file) {
+		return jarFileConverter.createJarFile(file);
+	}
 
-    private String parseAttribute(final Properties properties, String attributeName) {
-        String value = properties.getProperty(attributeName);
-        return value;
-    }
+	private String parseAttribute(final Properties properties,
+			String attributeName) {
+		String value = properties.getProperty(attributeName);
+		return value;
+	}
 
-    private String parseGroupID(final Properties properties) {
-        return parseAttribute(properties, PROPERTY_KEY_GROUP_ID);
-    }
+	private String parseGroupID(final Properties properties) {
+		return parseAttribute(properties, PROPERTY_KEY_GROUP_ID);
+	}
 
-    private String parseArtifactID(final Properties properties) {
-        return parseAttribute(properties, PROPERTY_KEY_ARTIFACT_ID);
-    }
+	private String parseArtifactID(final Properties properties) {
+		return parseAttribute(properties, PROPERTY_KEY_ARTIFACT_ID);
+	}
 
-    private String parseVersion(final Properties properties) {
-        return parseAttribute(properties, PROPERTY_KEY_VERSION);
-    }
+	private String parseVersion(final Properties properties) {
+		return parseAttribute(properties, PROPERTY_KEY_VERSION);
+	}
 
-    @Override
-    public boolean isApplicable(DependencyType dependencyType) {
-        return dependencyType == DependencyType.JAR;
-    }
+	@Override
+	public boolean isApplicable(DependencyType dependencyType) {
+		return dependencyType == DependencyType.JAR;
+	}
 
-    public static String extractGroupID(String fileName) {
-        return extract(fileName, 3);
-    }
+	public static String extractGroupID(String fileName) {
+		return extract(fileName, 3);
+	}
 
-    public static String extractArtifactID(String fileName) {
-        return extract(fileName, 2);
-    }
+	public static String extractArtifactID(String fileName) {
+		return extract(fileName, 2);
+	}
 
-    public static String extract(String fileName, int index) {
-        String[] split = fileName.split("/");
-        if (split.length >= 4) {
-            return split[split.length - index];
-        }
-        return "";
-    }
+	public static String extract(String fileName, int index) {
+		String[] split = fileName.split("/");
+		if (split.length >= 4) {
+			return split[split.length - index];
+		}
+		return "";
+	}
 
-    public interface IFileToJarFileConverter {
-        public Optional<JarFile> createJarFile(File file);
-    }
+	public interface IFileToJarFileConverter {
+		public Optional<JarFile> createJarFile(File file);
+	}
 
-    private class DefaultJarFileConverter implements IFileToJarFileConverter {
-        @Override
-        public Optional<JarFile> createJarFile(File file) {
-            try {
-                JarFile jarFile = new JarFile(file);
-                return fromNullable(jarFile);
-            } catch (IOException e) {
-                return absent();
-            }
-        }
-    }
+	private class DefaultJarFileConverter implements IFileToJarFileConverter {
+		@Override
+		public Optional<JarFile> createJarFile(File file) {
+			try {
+				JarFile jarFile = new JarFile(file);
+				return fromNullable(jarFile);
+			} catch (IOException e) {
+				return absent();
+			}
+		}
+	}
 
 }

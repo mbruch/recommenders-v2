@@ -11,7 +11,7 @@
 package org.eclipse.recommenders.examples.models;
 
 import org.eclipse.recommenders.models.ProjectCoordinate;
-import org.eclipse.recommenders.models.dependencies.IDependencyInfo;
+import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.IMappingProvider;
 import org.eclipse.recommenders.models.dependencies.IMappingStrategy;
 import org.eclipse.recommenders.models.dependencies.impl.MavenPomPropertiesStrategy;
@@ -21,7 +21,7 @@ import com.google.common.base.Optional;
 public class MappingWorkFlowExample {
 
     public static void useOfMapping(IMappingProvider mapping) {
-        IDependencyInfo ed = null;
+        DependencyInfo ed = null;
 
         mapping.addStrategy(new MavenPomPropertiesStrategy());
 

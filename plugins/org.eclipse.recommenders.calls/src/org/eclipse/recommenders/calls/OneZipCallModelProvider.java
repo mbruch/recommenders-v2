@@ -2,7 +2,8 @@ package org.eclipse.recommenders.calls;
 
 import static com.google.common.base.Optional.of;
 import static org.eclipse.recommenders.utils.IOUtils.closeQuietly;
-import static org.eclipse.recommenders.utils.Zips.*;
+import static org.eclipse.recommenders.utils.Zips.closeQuietly;
+import static org.eclipse.recommenders.utils.Zips.readFully;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,9 +21,9 @@ import org.eclipse.recommenders.utils.names.ITypeName;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.Optional;
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * A model provider that uses a single zip file to resolve and load call models from.
@@ -36,7 +37,7 @@ public class OneZipCallModelProvider implements ICallModelProvider, Openable {
 
     private final File models;
     private ZipFile zip;
-    private final Cache<ITypeName, ICallModel> cache = CacheBuilder.newBuilder()
+    private final LoadingCache<ITypeName, ICallModel> cache = CacheBuilder.newBuilder()
             .expireAfterAccess(3, TimeUnit.MINUTES)
             .maximumSize(30)
             .build(new CallNetCacheLoader());

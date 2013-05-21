@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Require-Bundle: com.google.guava;bundle-version="[10.0.0,11.0.0)",org.
+ eclipse.recommenders.utils,org.eclipse.jdt.core,org.apache.commons.la
+ ng3,org.eclipse.core.runtime,org.eclipse.core.resources,org.eclipse.j
+ dt.ui,org.eclipse.jface.text,org.eclipse.ui,org.eclipse.ui.editors,or
+ g.eclipse.recommenders.injection,org.slf4j.api
+Export-Package: org.eclipse.recommenders.utils.rcp,org.eclipse.recomme
+ nders.utils.rcp.ast,org.eclipse.recommenders.utils.rcp.internal
+Eclipse-SourceReferences: scm:git:http://git.eclipse.org/gitroot/recom
+ menders/org.eclipse.recommenders.git;path="plugins/org.eclipse.recomm
+ enders.utils.rcp";commitId=4eb733f864fba47d1107b91183816221ee088ad0
+Bundle-Vendor: Eclipse Code Recommenders
+Bundle-ActivationPolicy: lazy
+Bundle-Version: 1.0.3.v20130412-1928-b000
+Bundle-Name: Code Recommenders: IDE Utils
+Bundle-Activator: org.eclipse.recommenders.utils.rcp.internal.Recommen
+ dersUtilsPlugin
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.eclipse.recommenders.utils.rcp
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+
