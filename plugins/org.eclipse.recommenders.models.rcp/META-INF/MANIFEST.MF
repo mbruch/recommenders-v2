@@ -5,15 +5,17 @@ Bundle-SymbolicName: org.eclipse.recommenders.models.rcp;singleton:=true
 Bundle-Version: 1.100.0.qualifier
 Bundle-Vendor: Eclipse Code Recommenders
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.eclipse.recommenders.injection,
- org.eclipse.recommenders.models;bundle-version="1.100.0",
- org.eclipse.recommenders.utils,
- org.eclipse.recommenders.utils.rcp,
+Require-Bundle: org.eclipse.recommenders.models;bundle-version="1.100.0",
  org.eclipse.e4.ui.workbench,
  org.eclipse.equinox.common,
  com.google.guava;bundle-version="10.0.1",
  org.eclipse.jdt.core,
  org.eclipse.e4.core.di;bundle-version="1.1.0",
  org.eclipse.e4.core.di.extensions;bundle-version="0.11.0",
- org.eclipse.e4.core.contexts;bundle-version="1.1.0"
-Export-Package: org.eclipse.recommenders.models.rcp
+ org.eclipse.e4.core.contexts;bundle-version="1.1.0",
+ org.eclipse.core.runtime;bundle-version="3.9.0",
+ org.eclipse.core.resources;bundle-version="3.8.100",
+ org.eclipse.jdt.launching;bundle-version="3.7.0",
+ org.eclipse.recommenders.rcp;bundle-version="1.0.4"
+Export-Package: org.eclipse.recommenders.models.dependencies.rcp,
+ org.eclipse.recommenders.models.rcp

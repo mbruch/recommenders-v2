@@ -12,8 +12,10 @@ package org.eclipse.recommenders.models.dependencies;
 
 import java.util.Set;
 
-public interface IDependencyListener {
-
+public interface IDependencyListener<A> {
+    
+    public Set<DependencyInfo> getDependenciesForProject(A project);
+    
     public Set<DependencyInfo> getDependencies();
 
 }
