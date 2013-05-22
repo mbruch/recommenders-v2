@@ -23,16 +23,16 @@ import org.eclipse.recommenders.models.dependencies.IMappingStrategy;
 import org.eclipse.recommenders.utils.annotations.Testing;
 
 import com.google.common.base.Optional;
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheStats;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 
 public class MappingProvider implements IMappingProvider {
 
     List<IMappingStrategy> strategies = Lists.newArrayList();
-    private LoadingCache<DependencyInfo, Optional<ProjectCoordinate>> cache;
+    private Cache<DependencyInfo, Optional<ProjectCoordinate>> cache;
 
     public MappingProvider() {
         cache = CacheBuilder.newBuilder()

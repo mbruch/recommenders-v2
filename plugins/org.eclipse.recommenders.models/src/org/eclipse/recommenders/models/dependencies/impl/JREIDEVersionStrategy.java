@@ -16,7 +16,6 @@ import static com.google.common.base.Optional.fromNullable;
 import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
-import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 
 import com.google.common.base.Optional;
 

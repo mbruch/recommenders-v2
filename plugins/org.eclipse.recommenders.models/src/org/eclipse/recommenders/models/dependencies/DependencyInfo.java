@@ -14,72 +14,65 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.recommenders.utils.Checks;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 
 public class DependencyInfo {
 
-    public static final String JRE_VERSION_IDE = "JRE_VERSION_IDE";
+	public static final String JRE_VERSION_IDE = "JRE_VERSION_IDE";
 
-    private final File file;
-    private final DependencyType type;
-    private final Map<String, String> attributes;
+	private final File file;
+	private final DependencyType type;
+	private final Map<String, String> attributes;
 
-    public DependencyInfo(File file, DependencyType type) {
-        this(file, type, Collections.<String, String> emptyMap());
-    }
+	public DependencyInfo(File file, DependencyType type) {
+		this(file, type, Collections.<String, String> emptyMap());
+	}
 
-    public DependencyInfo(File file, DependencyType type, Map<String, String> attributes) {
-        this.file = file;
-        this.type = type;
-        this.attributes = Checks.ensureIsNotNull(attributes);
-    }
+	public DependencyInfo(File file, DependencyType type,
+			Map<String, String> attributes) {
+		this.file = file;
+		this.type = type;
+		this.attributes = Checks.ensureIsNotNull(attributes);
+	}
 
-    public File getFile() {
-        return file;
-    }
+	public File getFile() {
+		return file;
+	}
 
-    public DependencyType getType() {
-        return type;
-    }
+	public DependencyType getType() {
+		return type;
+	}
 
-    public Optional<String> getAttribute(String key) {
-        return Optional.fromNullable(attributes.get(key));
-    }
+	public Optional<String> getAttribute(String key) {
+		return Optional.fromNullable(attributes.get(key));
+	}
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
-        result = prime * result + ((file == null) ? 0 : file.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        return result;
-    }
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(file).append(type)
+				.append(attributes).toHashCode();
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        DependencyInfo other = (DependencyInfo) obj;
-        if (attributes == null) {
-            if (other.attributes != null)
-                return false;
-        } else if (!attributes.equals(other.attributes))
-            return false;
-        if (file == null) {
-            if (other.file != null)
-                return false;
-        } else if (!file.equals(other.file))
-            return false;
-        if (type != other.type)
-            return false;
-        return true;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof DependencyInfo) {
+			final DependencyInfo other = (DependencyInfo) obj;
+			return new EqualsBuilder().append(file, other.file)
+					.append(type, other.type)
+					.append(attributes, other.attributes).isEquals();
+		} else {
+			return false;
+		}
+	}
 
+	@Override
+	public String toString() {
+		return Objects.toStringHelper("").addValue(file).addValue(type)
+				.addValue(attributes).toString();
+	}
 }

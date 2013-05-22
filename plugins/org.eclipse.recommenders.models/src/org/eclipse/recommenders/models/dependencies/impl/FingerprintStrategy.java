@@ -20,9 +20,6 @@ import org.eclipse.recommenders.utils.Fingerprints;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 import com.google.common.base.Optional;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashCodes;
-import com.google.common.io.Files;
 
 public class FingerprintStrategy extends AbstractStrategy {
 
