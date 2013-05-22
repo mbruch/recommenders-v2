@@ -107,4 +107,23 @@ public class MappingProvider implements IMappingProvider {
         return fromNullable(cache.stats());
     }
 
+	@Override
+	public void mapManually(DependencyInfo dependencyInfo,
+			ProjectCoordinate projectCoordinate) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void removeMapping(DependencyInfo dependencyInfo) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean isManualMapping(DependencyInfo dependencyInfo) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
