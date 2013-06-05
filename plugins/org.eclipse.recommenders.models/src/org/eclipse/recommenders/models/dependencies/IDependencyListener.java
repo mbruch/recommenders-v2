@@ -12,9 +12,9 @@ package org.eclipse.recommenders.models.dependencies;
 
 import java.util.Set;
 
-public interface IDependencyListener<A> {
+public interface IDependencyListener {
     
-    public Set<DependencyInfo> getDependenciesForProject(A project);
+    public Set<DependencyInfo> getDependenciesForProject(DependencyInfo project);
     
     public Set<DependencyInfo> getDependencies();
 

@@ -15,13 +15,20 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jdt.launching.LibraryLocation;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
 import org.eclipse.recommenders.models.dependencies.rcp.EclipseDependencyListener;
@@ -102,8 +109,29 @@ public class EclipseDependencyListenerTest {
         String projectName = generateProjectName();
         IJavaProject javaProject = createProject(projectName);
         eventBus.post(new JavaProjectOpened(javaProject));
-
-        assertTrue(sut.getDependencies().containsAll(sut.getDependenciesForProject(javaProject))); 
+        assertTrue(sut.getDependencies().containsAll(sut.getDependenciesForProject(EclipseDependencyListener.createDependencyInfoForProject(javaProject)))); 
+    }
+    
+    @Test
+    public void testJREIsAddedCorrect() throws Exception{
+    	String projectName = generateProjectName();
+    	IJavaProject javaProject = createProject(projectName);
+    	
+    	List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+    	IVMInstall vmInstall = JavaRuntime.getDefaultVMInstall();
+    	LibraryLocation[] locations = JavaRuntime.getLibraryLocations(vmInstall);
+    	for (LibraryLocation element : locations) {
+    	 entries.add(JavaCore.newLibraryEntry(element.getSystemLibraryPath(), null, null));
+    	}
+    	//add libs to project class path
+    	javaProject.setRawClasspath(entries.toArray(new IClasspathEntry[entries.size()]), null);
+    	
+    	eventBus.post(new JavaProjectOpened(javaProject));
+    	Set<DependencyInfo> dependenciesForProject = sut.getDependenciesForProject(EclipseDependencyListener.createDependencyInfoForProject(javaProject));
+    	for (DependencyInfo dependencyInfo : dependenciesForProject) {
+			System.out.println(dependencyInfo.toString());
+		}
+    	
     }
 
 }

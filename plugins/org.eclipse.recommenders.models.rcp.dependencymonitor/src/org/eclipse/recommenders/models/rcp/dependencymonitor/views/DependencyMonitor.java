@@ -90,8 +90,7 @@ public class DependencyMonitor extends ViewPart {
         EventBus eventBus = InjectionService.getInstance().requestInstance(EventBus.class);
         eventBus.register(this);
         
-        @SuppressWarnings("unchecked")
-        IDependencyListener<IJavaProject> requestInstance = InjectionService.getInstance().requestInstance(IDependencyListener.class);
+        IDependencyListener requestInstance = InjectionService.getInstance().requestInstance(IDependencyListener.class);
         eclipseDependencyListener = (EclipseDependencyListener) requestInstance;
 
     }
