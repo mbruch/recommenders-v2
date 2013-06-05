@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Require-Bundle: org.junit,org.mockito;bundle-version="1.8.4",org.hamcr
+ est;bundle-version="1.1.0"
+Eclipse-SourceReferences: scm:git:http://git.eclipse.org/gitroot/recom
+ menders/org.eclipse.recommenders.git;path="tests/org.eclipse.recommen
+ ders.tests.models";commitId=66a806a2e02fb0f71307ae3b5f47418cd3fff4b0
+Bundle-Vendor: Eclipse Code Recommenders
+Fragment-Host: org.eclipse.recommenders.models
+Bundle-Version: 1.100.0.v20130605-1443-b000
+Bundle-Name: Code Recommenders: Tests Model
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.eclipse.recommenders.tests.models;singleton:=
+ true
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+

@@ -11,9 +11,9 @@
 package org.eclipse.recommenders.models.dependencies.impl;
 
 import static com.google.common.base.Optional.absent;
-import static com.google.common.base.Optional.fromNullable;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
@@ -25,8 +25,6 @@ import org.eclipse.recommenders.utils.annotations.Testing;
 import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.CacheStats;
 import com.google.common.collect.Lists;
 
 public class MappingProvider implements IMappingProvider {
@@ -36,15 +34,8 @@ public class MappingProvider implements IMappingProvider {
 
     public MappingProvider() {
         cache = CacheBuilder.newBuilder()
-                .maximumSize(200)
-                .build(new CacheLoader<DependencyInfo, Optional<ProjectCoordinate>>() {
-
-                    @Override
-                    public Optional<ProjectCoordinate> load(DependencyInfo key) throws Exception {
-
-                        return extractProjectCoordinate(key);
-                    }
-                });
+                .maximumSize(200).recordStats()
+                .build();
     }
 
     @Override
@@ -58,14 +49,20 @@ public class MappingProvider implements IMappingProvider {
     }
 
     @Override
-    public void setStrategy(List<IMappingStrategy> strategies) {
+    public void setStrategies(List<IMappingStrategy> strategies) {
         this.strategies = strategies;
     }
 
     @Override
-    public Optional<ProjectCoordinate> searchForProjectCoordinate(DependencyInfo dependencyInfo) {
+    public Optional<ProjectCoordinate> searchForProjectCoordinate(final DependencyInfo dependencyInfo) {
         try {
-            return cache.get(dependencyInfo);
+        	return cache.get(dependencyInfo, new Callable<Optional<ProjectCoordinate>>() {
+
+				@Override
+				public Optional<ProjectCoordinate> call() throws Exception {
+					return extractProjectCoordinate(dependencyInfo);
+				}
+			});
         } catch (Exception e) {
             return absent();
         }
@@ -101,10 +98,15 @@ public class MappingProvider implements IMappingProvider {
         // TODO: Load mappings when the IDE starts
         // TODO: Needed at least guava 11.0.2, to load stored mappings into the cache.
     }
-
+    
     @Testing
-    public Optional<CacheStats> getCacheStats() {
-        return fromNullable(cache.stats());
+    public long getMissCount(){
+    	return cache.stats().missCount();
+    }
+    
+    @Testing
+    public long getHitCount(){
+    	return cache.stats().hitCount();
     }
 
 	@Override

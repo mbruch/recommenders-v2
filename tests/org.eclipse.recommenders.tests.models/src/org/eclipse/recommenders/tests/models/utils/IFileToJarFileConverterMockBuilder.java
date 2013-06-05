@@ -8,7 +8,7 @@
  * Contributors:
  *     Olav Lenz - initial API and implementation
  */
-package org.eclipse.recommenders.tests.models;
+package org.eclipse.recommenders.tests.models.utils;
 
 import static com.google.common.base.Optional.fromNullable;
 import static org.eclipse.recommenders.utils.Throws.throwUnhandledException;
@@ -23,7 +23,6 @@ import java.util.Properties;
 import java.util.jar.JarFile;
 
 import org.eclipse.recommenders.models.dependencies.impl.MavenPomPropertiesStrategy.IFileToJarFileConverter;
-import org.eclipse.recommenders.tests.JarFileMockBuilder;
 import org.eclipse.recommenders.utils.Tuple;
 
 import com.google.common.base.Optional;

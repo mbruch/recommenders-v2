@@ -19,19 +19,19 @@ import org.eclipse.recommenders.models.ProjectCoordinate;
  */
 public interface IMappingProvider extends IMappingStrategy {
 
-    public List<IMappingStrategy> getStrategies();
+    List<IMappingStrategy> getStrategies();
 
-    public void addStrategy(IMappingStrategy strategy);
+    void addStrategy(IMappingStrategy strategy);
 
-    public void setStrategy(List<IMappingStrategy> strategies);
+    void setStrategies(List<IMappingStrategy> strategies);
 
-    public void mapManually(DependencyInfo dependencyInfo, ProjectCoordinate projectCoordinate);
+    void mapManually(DependencyInfo dependencyInfo, ProjectCoordinate projectCoordinate);
     
-    public void removeMapping(DependencyInfo dependencyInfo);
+    void removeMapping(DependencyInfo dependencyInfo);
     
-    public boolean isManualMapping(DependencyInfo dependencyInfo);
+    boolean isManualMapping(DependencyInfo dependencyInfo);
     
-    public void storeMappings();
+    void storeMappings();
 
-    public void loadMappings();
+    void loadMappings();
 }

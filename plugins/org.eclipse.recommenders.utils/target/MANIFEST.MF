@@ -1,22 +1,22 @@
 Manifest-Version: 1.0
-Require-Bundle: org.apache.commons.lang3;bundle-version="[3.0.0,4.0.0)
- ",com.google.gson;bundle-version="[2.0.0,3.0.0)",com.google.guava;bun
- dle-version="[10.0.0,11.0.0)",org.slf4j.api;bundle-version="[1.6.0,2.
- 0.0)",org.eclipse.osgi,org.apache.commons.io;bundle-version="[2.0.0,3
- .0.0)"
-Export-Package: org.eclipse.recommenders.internal.utils.codestructs,or
- g.eclipse.recommenders.utils,org.eclipse.recommenders.utils.annotatio
- ns,org.eclipse.recommenders.utils.archive,org.eclipse.recommenders.ut
- ils.gson;uses:="com.google.common.collect,com.google.gson",org.eclips
- e.recommenders.utils.names,org.eclipse.recommenders.utils.parser;uses
- :="com.google.common.base"
+Export-Package: org.eclipse.recommenders.utils,org.eclipse.recommender
+ s.utils.annotations,org.eclipse.recommenders.utils.gson,org.eclipse.r
+ ecommenders.utils.names
 Eclipse-SourceReferences: scm:git:http://git.eclipse.org/gitroot/recom
  menders/org.eclipse.recommenders.git;path="plugins/org.eclipse.recomm
- enders.utils";commitId=4eb733f864fba47d1107b91183816221ee088ad0
+ enders.utils";commitId=66a806a2e02fb0f71307ae3b5f47418cd3fff4b0
 Bundle-Vendor: Eclipse Code Recommenders
-Bundle-Version: 1.0.3.v20130412-1928-b000
+Bundle-Version: 1.100.0.v20130605-1443-b000
 Bundle-Name: Code Recommenders: Utils
 Bundle-ManifestVersion: 2
+Import-Package: com.google.common.annotations;version="[12.0.0,13.0.0)
+ ",com.google.common.base;version="[12.0.0,13.0.0)",com.google.common.
+ collect;version="[12.0.0,13.0.0)",com.google.common.io;version="[12.0
+ .0,13.0.0)",com.google.gson;version="[2.0.0,3.0.0)",com.google.gson.r
+ eflect;version="[2.0.0,3.0.0)",org.apache.commons.io;version="[2.0.0,
+ 3.0.0)",org.apache.commons.io.filefilter;version="[2.0.0,3.0.0)",org.
+ apache.commons.lang3;version="[3.0.0,4.0.0)",org.apache.commons.lang3
+ .builder;version="[3.1.0,4.0.0)"
 Bundle-SymbolicName: org.eclipse.recommenders.utils
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 

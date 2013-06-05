@@ -30,7 +30,7 @@ import com.google.common.reflect.Reflection;
  */
 public abstract class SimpleModelProvider<K extends IBasedName<?>, M> implements IModelProvider<K, M> {
 
-    protected final LoadingCache<ModelArchiveCoordinate, ZipFile> openZips = CacheBuilder.newBuilder()
+    private final LoadingCache<ModelArchiveCoordinate, ZipFile> openZips = CacheBuilder.newBuilder()
             .maximumSize(10)
             .expireAfterAccess(1, MINUTES)
             .removalListener(new ZipRemovalListener())

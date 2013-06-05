@@ -59,7 +59,7 @@ public class Recommendations {
         };
     }
 
-    public static interface TopElementsSelector<T> {
+    public interface TopElementsSelector<T> {
         int select(List<Recommendation<T>> filtered);
     }
 

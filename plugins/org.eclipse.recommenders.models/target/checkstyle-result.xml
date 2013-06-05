@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="5.6">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\BasedTypeName.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\DependencyInfo.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\DependencyType.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\IDependencyListener.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\IMappingProvider.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\IMappingStrategy.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\impl\AbstractStrategy.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\impl\FingerprintStrategy.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\impl\JREIDEVersionStrategy.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\impl\JREReleaseFileStrategy.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\impl\MappingProvider.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\impl\MavenPomPropertiesStrategy.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\impl\SimpleIndexSearcher.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\IProjectCoordinateProvider.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\dependencies\ProjectCoordinateProviders.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\IBasedName.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\IModelProvider.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\ModelArchiveCoordinate.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\ModelRepository.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\PoolingModelProvider.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\ProjectCoordinate.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.models\src\org\eclipse\recommenders\models\SimpleModelProvider.java">
+</file>
+</checkstyle>

@@ -39,7 +39,7 @@ public class JREReleaseFileStrategyTest {
     private File javaHomeDirectory;
     private File releaseFile;
 
-    private void createJavaHomeDirectory() {
+    private void createJavaHomeDirectory() throws IOException {
         javaHomeDirectory = folder.newFolder("JAVA_HOME");
     }
 
@@ -101,7 +101,7 @@ public class JREReleaseFileStrategyTest {
     }
 
     @Test
-    public void testMissingReleaseFile() {
+    public void testMissingReleaseFile() throws IOException {
         createJavaHomeDirectory();
 
         DependencyInfo info = new DependencyInfo(javaHomeDirectory, DependencyType.JRE);

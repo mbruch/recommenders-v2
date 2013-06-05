@@ -177,7 +177,7 @@ public class MavenPomPropertiesStrategy extends AbstractStrategy {
 	}
 
 	public interface IFileToJarFileConverter {
-		public Optional<JarFile> createJarFile(File file);
+		Optional<JarFile> createJarFile(File file);
 	}
 
 	private class DefaultJarFileConverter implements IFileToJarFileConverter {

@@ -14,8 +14,8 @@ import java.util.Set;
 
 public interface IDependencyListener {
     
-    public Set<DependencyInfo> getDependenciesForProject(DependencyInfo project);
+    Set<DependencyInfo> getDependenciesForProject(DependencyInfo project);
     
-    public Set<DependencyInfo> getDependencies();
+    Set<DependencyInfo> getDependencies();
 
 }

@@ -28,14 +28,13 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.google.common.base.Optional;
-import com.google.common.cache.CacheStats;
 import com.google.common.collect.Lists;
 
 public class MappingProviderTest {
 
-    private final static ProjectCoordinate EXPECTED_PROJECT_COORDINATE = new ProjectCoordinate("example",
+    private static final ProjectCoordinate EXPECTED_PROJECT_COORDINATE = new ProjectCoordinate("example",
             "example.project", "1.0.0");
-    private final static ProjectCoordinate ANOTHER_EXPECTED_PROJECT_COORDINATE = new ProjectCoordinate(
+    private static final ProjectCoordinate ANOTHER_EXPECTED_PROJECT_COORDINATE = new ProjectCoordinate(
             "another.example", "another.example.project", "1.2.3");
 
     private IMappingStrategy createMockedStrategy(ProjectCoordinate projectCoordinate,
@@ -60,7 +59,7 @@ public class MappingProviderTest {
     }
 
     @Test
-    public void testValidJRE() {
+    public void testMappingProviderWithMockedStrategy() {
         IMappingProvider sut = new MappingProvider();
         sut.addStrategy(createMockedStrategy(EXPECTED_PROJECT_COORDINATE));
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(new DependencyInfo(
@@ -143,10 +142,8 @@ public class MappingProviderTest {
         sut.addStrategy(createMockedStrategy(EXPECTED_PROJECT_COORDINATE));
         DependencyInfo dependencyInfo = new DependencyInfo(new File("example.jar"), DependencyType.JAR);
         sut.searchForProjectCoordinate(dependencyInfo);
-
-        CacheStats cacheStats = sut.getCacheStats().get();
-
-        assertEquals(1, cacheStats.missCount());
+        sut.getHitCount();
+        assertEquals(1, sut.getMissCount());
     }
 
     @Test
@@ -157,9 +154,7 @@ public class MappingProviderTest {
         sut.searchForProjectCoordinate(dependencyInfo);
         sut.searchForProjectCoordinate(dependencyInfo);
 
-        CacheStats cacheStats = sut.getCacheStats().get();
-
-        assertEquals(1, cacheStats.hitCount());
+        assertEquals(1, sut.getHitCount());
     }
 
 }

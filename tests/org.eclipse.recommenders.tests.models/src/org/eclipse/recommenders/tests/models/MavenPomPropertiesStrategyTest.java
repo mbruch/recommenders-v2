@@ -22,6 +22,7 @@ import org.eclipse.recommenders.models.dependencies.DependencyType;
 import org.eclipse.recommenders.models.dependencies.IMappingStrategy;
 import org.eclipse.recommenders.models.dependencies.impl.MavenPomPropertiesStrategy;
 import org.eclipse.recommenders.models.dependencies.impl.MavenPomPropertiesStrategy.IFileToJarFileConverter;
+import org.eclipse.recommenders.tests.models.utils.IFileToJarFileConverterMockBuilder;
 import org.junit.Test;
 
 import com.google.common.base.Optional;
