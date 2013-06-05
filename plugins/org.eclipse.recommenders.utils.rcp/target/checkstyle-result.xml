@@ -1,39 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="5.6">
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/ast/ASTNodeUtils.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\ast\ASTNodeUtils.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/ast/ASTStringUtils.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\ast\ASTStringUtils.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/ast/BindingUtils.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\ast\BindingUtils.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/ast/MethodDeclarationFinder.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\ast\MethodDeclarationFinder.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/CompilerBindings.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\CompilerBindings.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/CompletionProposalDecorator.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\CompletionProposalDecorator.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/EclipseLogger.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\EclipseLogger.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/internal/ContentAssistEnablementBlock.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\events\JavaModelEvents.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/internal/MyWorkingCopyOwner.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\internal\ContentAssistEnablementBlock.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/internal/PreferencesInitalizer.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\internal\MyWorkingCopyOwner.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/internal/RecommendersUtilsPlugin.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\internal\PreferencesInitalizer.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/JavaElementResolver.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\internal\RecommendersUtilsPlugin.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/JdtCompletionProposal.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\JavaElementResolver.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/JdtUtils.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\JdtCompletionProposal.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/LoggingUtils.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\JdtUtils.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/PartListener2Adapter.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\LoggingUtils.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/RCPUtils.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\PartListener2Adapter.java">
 </file>
-<file name="/Users/Marcel/Repositories/org.eclipse.recommenders/plugins/org.eclipse.recommenders.utils.rcp/src/org/eclipse/recommenders/utils/rcp/UUIDHelper.java">
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\RCPUtils.java">
+</file>
+<file name="D:\!CoRe\github-Git\plugins\org.eclipse.recommenders.utils.rcp\src\org\eclipse\recommenders\utils\rcp\UUIDHelper.java">
 </file>
 </checkstyle>

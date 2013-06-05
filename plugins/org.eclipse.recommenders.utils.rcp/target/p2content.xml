@@ -1,75 +1,78 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <units size='2'>
-  <unit id='org.eclipse.recommenders.utils.rcp' version='1.0.3.v20130412-1928-b000' singleton='false'>
-    <update id='org.eclipse.recommenders.utils.rcp' range='[0.0.0,1.0.3.v20130412-1928-b000)' severity='0'/>
+  <unit id='org.eclipse.recommenders.utils.rcp' version='1.100.0.v20130605-1547-b000' singleton='false'>
+    <update id='org.eclipse.recommenders.utils.rcp' range='[0.0.0,1.100.0.v20130605-1547-b000)' severity='0'/>
     <properties size='5'>
       <property name='org.eclipse.equinox.p2.name' value='Code Recommenders: IDE Utils'/>
       <property name='org.eclipse.equinox.p2.provider' value='Eclipse Code Recommenders'/>
-      <property name='maven-groupId' value='org.eclipse.recommenders.plugin'/>
+      <property name='maven-groupId' value='org.eclipse.recommenders'/>
       <property name='maven-artifactId' value='org.eclipse.recommenders.utils.rcp'/>
-      <property name='maven-version' value='1.0.3-SNAPSHOT'/>
+      <property name='maven-version' value='1.100.0-SNAPSHOT'/>
     </properties>
-    <provides size='6'>
-      <provided namespace='org.eclipse.equinox.p2.iu' name='org.eclipse.recommenders.utils.rcp' version='1.0.3.v20130412-1928-b000'/>
-      <provided namespace='osgi.bundle' name='org.eclipse.recommenders.utils.rcp' version='1.0.3.v20130412-1928-b000'/>
+    <provides size='7'>
+      <provided namespace='org.eclipse.equinox.p2.iu' name='org.eclipse.recommenders.utils.rcp' version='1.100.0.v20130605-1547-b000'/>
+      <provided namespace='osgi.bundle' name='org.eclipse.recommenders.utils.rcp' version='1.100.0.v20130605-1547-b000'/>
       <provided namespace='java.package' name='org.eclipse.recommenders.utils.rcp' version='0.0.0'/>
       <provided namespace='java.package' name='org.eclipse.recommenders.utils.rcp.ast' version='0.0.0'/>
+      <provided namespace='java.package' name='org.eclipse.recommenders.utils.rcp.events' version='0.0.0'/>
       <provided namespace='java.package' name='org.eclipse.recommenders.utils.rcp.internal' version='0.0.0'/>
       <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='bundle' version='1.0.0'/>
     </provides>
-    <requires size='12'>
-      <required namespace='osgi.bundle' name='com.google.guava' range='[10.0.0,11.0.0)'/>
-      <required namespace='osgi.bundle' name='org.eclipse.recommenders.utils' range='0.0.0'/>
+    <requires size='14'>
       <required namespace='osgi.bundle' name='org.eclipse.jdt.core' range='0.0.0'/>
-      <required namespace='osgi.bundle' name='org.apache.commons.lang3' range='0.0.0'/>
       <required namespace='osgi.bundle' name='org.eclipse.core.runtime' range='0.0.0'/>
       <required namespace='osgi.bundle' name='org.eclipse.core.resources' range='0.0.0'/>
-      <required namespace='osgi.bundle' name='org.eclipse.jdt.ui' range='0.0.0'/>
+      <required namespace='osgi.bundle' name='org.eclipse.recommenders.utils' range='0.0.0'/>
       <required namespace='osgi.bundle' name='org.eclipse.jface.text' range='0.0.0'/>
       <required namespace='osgi.bundle' name='org.eclipse.ui' range='0.0.0'/>
-      <required namespace='osgi.bundle' name='org.eclipse.ui.editors' range='0.0.0'/>
-      <required namespace='osgi.bundle' name='org.eclipse.recommenders.injection' range='0.0.0'/>
-      <required namespace='osgi.bundle' name='org.slf4j.api' range='0.0.0'/>
+      <required namespace='osgi.bundle' name='org.eclipse.jdt.ui' range='0.0.0'/>
+      <required namespace='java.package' name='com.google.common.base' range='[12.0.0,13.0.0)'/>
+      <required namespace='java.package' name='com.google.common.collect' range='[12.0.0,13.0.0)'/>
+      <required namespace='java.package' name='com.google.inject' range='[1.0.0,2.0.0)'/>
+      <required namespace='java.package' name='org.apache.commons.lang3' range='[3.0.0,4.0.0)'/>
+      <required namespace='java.package' name='org.apache.commons.lang3.builder' range='[3.0.0,4.0.0)'/>
+      <required namespace='java.package' name='org.eclipse.ui.texteditor' range='0.0.0'/>
+      <required namespace='java.package' name='org.slf4j.helpers' range='[1.7.0,2.0.0)'/>
     </requires>
     <artifacts size='1'>
-      <artifact classifier='osgi.bundle' id='org.eclipse.recommenders.utils.rcp' version='1.0.3.v20130412-1928-b000'/>
+      <artifact classifier='osgi.bundle' id='org.eclipse.recommenders.utils.rcp' version='1.100.0.v20130605-1547-b000'/>
     </artifacts>
     <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
     <touchpointData size='1'>
       <instructions size='1'>
         <instruction key='manifest'>
-          Bundle-SymbolicName: org.eclipse.recommenders.utils.rcp&#xA;Bundle-Version: 1.0.3.v20130412-1928-b000&#xA;
+          Bundle-SymbolicName: org.eclipse.recommenders.utils.rcp&#xA;Bundle-Version: 1.100.0.v20130605-1547-b000&#xA;
         </instruction>
       </instructions>
     </touchpointData>
   </unit>
-  <unit id='org.eclipse.recommenders.utils.rcp.source' version='1.0.3.v20130412-1928-b000' singleton='false'>
-    <update id='org.eclipse.recommenders.utils.rcp.source' range='[0.0.0,1.0.3.v20130412-1928-b000)' severity='0'/>
+  <unit id='org.eclipse.recommenders.utils.rcp.source' version='1.100.0.v20130605-1547-b000' singleton='false'>
+    <update id='org.eclipse.recommenders.utils.rcp.source' range='[0.0.0,1.100.0.v20130605-1547-b000)' severity='0'/>
     <properties size='9'>
       <property name='df_LT.bundleVendor' value='Eclipse Code Recommenders'/>
       <property name='df_LT.bundleName' value='Code Recommenders: IDE Utils Source'/>
       <property name='org.eclipse.equinox.p2.name' value='%bundleName'/>
       <property name='org.eclipse.equinox.p2.provider' value='%bundleVendor'/>
       <property name='org.eclipse.equinox.p2.bundle.localization' value='OSGI-INF/l10n/bundle-src'/>
-      <property name='maven-groupId' value='org.eclipse.recommenders.plugin'/>
+      <property name='maven-groupId' value='org.eclipse.recommenders'/>
       <property name='maven-artifactId' value='org.eclipse.recommenders.utils.rcp'/>
-      <property name='maven-version' value='1.0.3-SNAPSHOT'/>
+      <property name='maven-version' value='1.100.0-SNAPSHOT'/>
       <property name='maven-classifier' value='sources'/>
     </properties>
     <provides size='4'>
-      <provided namespace='org.eclipse.equinox.p2.iu' name='org.eclipse.recommenders.utils.rcp.source' version='1.0.3.v20130412-1928-b000'/>
-      <provided namespace='osgi.bundle' name='org.eclipse.recommenders.utils.rcp.source' version='1.0.3.v20130412-1928-b000'/>
+      <provided namespace='org.eclipse.equinox.p2.iu' name='org.eclipse.recommenders.utils.rcp.source' version='1.100.0.v20130605-1547-b000'/>
+      <provided namespace='osgi.bundle' name='org.eclipse.recommenders.utils.rcp.source' version='1.100.0.v20130605-1547-b000'/>
       <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='source' version='1.0.0'/>
       <provided namespace='org.eclipse.equinox.p2.localization' name='df_LT' version='1.0.0'/>
     </provides>
     <artifacts size='1'>
-      <artifact classifier='osgi.bundle' id='org.eclipse.recommenders.utils.rcp.source' version='1.0.3.v20130412-1928-b000'/>
+      <artifact classifier='osgi.bundle' id='org.eclipse.recommenders.utils.rcp.source' version='1.100.0.v20130605-1547-b000'/>
     </artifacts>
     <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
     <touchpointData size='1'>
       <instructions size='1'>
         <instruction key='manifest'>
-          Bundle-SymbolicName: org.eclipse.recommenders.utils.rcp.source&#xA;Bundle-Version: 1.0.3.v20130412-1928-b000&#xA;
+          Bundle-SymbolicName: org.eclipse.recommenders.utils.rcp.source&#xA;Bundle-Version: 1.100.0.v20130605-1547-b000&#xA;
         </instruction>
       </instructions>
     </touchpointData>

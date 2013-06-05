@@ -2,4 +2,4 @@
 Test set: org.eclipse.recommenders.tests.models.JREReleaseFileStrategyTest
 -------------------------------------------------------------------------------
 Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 sec
-testInvalidType(org.eclipse.recommenders.tests.models.JREReleaseFileStrategyTest)  Time elapsed: 0 sectestReleaseFileWithoutVersion(org.eclipse.recommenders.tests.models.JREReleaseFileStrategyTest)  Time elapsed: 0 sectestMissingReleaseFile(org.eclipse.recommenders.tests.models.JREReleaseFileStrategyTest)  Time elapsed: 0.015 sectestValidReleaseFile(org.eclipse.recommenders.tests.models.JREReleaseFileStrategyTest)  Time elapsed: 0 sec
+testInvalidType(org.eclipse.recommenders.tests.models.JREReleaseFileStrategyTest)  Time elapsed: 0.015 sectestReleaseFileWithoutVersion(org.eclipse.recommenders.tests.models.JREReleaseFileStrategyTest)  Time elapsed: 0 sectestMissingReleaseFile(org.eclipse.recommenders.tests.models.JREReleaseFileStrategyTest)  Time elapsed: 0 sectestValidReleaseFile(org.eclipse.recommenders.tests.models.JREReleaseFileStrategyTest)  Time elapsed: 0 sec
