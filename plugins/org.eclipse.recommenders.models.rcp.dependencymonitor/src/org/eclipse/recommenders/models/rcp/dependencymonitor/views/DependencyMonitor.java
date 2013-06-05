@@ -1,9 +1,24 @@
 package org.eclipse.recommenders.models.rcp.dependencymonitor.views;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jdt.launching.LibraryLocation;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -81,7 +96,6 @@ public class DependencyMonitor extends ViewPart {
     }
 
     public DependencyMonitor() {
-        
         mp = new MappingProvider();
         mp.addStrategy(new MavenPomPropertiesStrategy());
         mp.addStrategy(new JREReleaseFileStrategy());
@@ -92,7 +106,6 @@ public class DependencyMonitor extends ViewPart {
         
         IDependencyListener requestInstance = InjectionService.getInstance().requestInstance(IDependencyListener.class);
         eclipseDependencyListener = (EclipseDependencyListener) requestInstance;
-
     }
     
     @Subscribe

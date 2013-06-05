@@ -6,8 +6,10 @@ Bundle-Version: 0.0.0.qualifier
 Bundle-Vendor: Eclipse Code Recommenders
 Fragment-Host: org.eclipse.recommenders.models.rcp;bundle-version="0.0.0.qualifier"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: org.junit
+Require-Bundle: org.junit,
+ org.eclipse.recommenders.utils.rcp
 Import-Package: org.eclipse.core.resources,
  org.eclipse.jdt.launching,
  org.eclipse.recommenders.models.dependencies.rcp,
- org.eclipse.recommenders.rcp.events
+ org.eclipse.recommenders.rcp.events,
+ org.eclipse.recommenders.utils.rcp
