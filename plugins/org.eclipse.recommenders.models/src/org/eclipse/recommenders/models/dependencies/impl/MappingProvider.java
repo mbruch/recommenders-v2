@@ -11,7 +11,9 @@
 package org.eclipse.recommenders.models.dependencies.impl;
 
 import static com.google.common.base.Optional.absent;
+import static com.google.common.base.Optional.fromNullable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -26,11 +28,13 @@ import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class MappingProvider implements IMappingProvider {
 
-    List<IMappingStrategy> strategies = Lists.newArrayList();
+    private List<IMappingStrategy> strategies = Lists.newArrayList();
     private Cache<DependencyInfo, Optional<ProjectCoordinate>> cache;
+    private HashMap<DependencyInfo, ProjectCoordinate> manualMappings = Maps.newHashMap(); 
 
     public MappingProvider() {
         cache = CacheBuilder.newBuilder()
@@ -89,12 +93,12 @@ public class MappingProvider implements IMappingProvider {
     }
 
     @Override
-    public void storeMappings() {
+    public void storeManualMappings() {
         // TODO: Store mappings when the IDE is closing
     }
 
     @Override
-    public void loadMappings() {
+    public void loadManualMappings() {
         // TODO: Load mappings when the IDE starts
         // TODO: Needed at least guava 11.0.2, to load stored mappings into the cache.
     }
@@ -110,22 +114,20 @@ public class MappingProvider implements IMappingProvider {
     }
 
 	@Override
-	public void mapManually(DependencyInfo dependencyInfo,
-			ProjectCoordinate projectCoordinate) {
-		// TODO Auto-generated method stub
-		
+	public void setManualMapping(DependencyInfo dependencyInfo, ProjectCoordinate projectCoordinate) {
+		manualMappings.put(dependencyInfo, projectCoordinate);
+		cache.put(dependencyInfo, fromNullable(projectCoordinate));
 	}
 
 	@Override
-	public void removeMapping(DependencyInfo dependencyInfo) {
-		// TODO Auto-generated method stub
-		
+	public void removeManualMapping(DependencyInfo dependencyInfo) {
+		manualMappings.remove(dependencyInfo);
+		cache.invalidate(dependencyInfo);
 	}
 
 	@Override
 	public boolean isManualMapping(DependencyInfo dependencyInfo) {
-		// TODO Auto-generated method stub
-		return false;
+		return manualMappings.containsKey(dependencyInfo);
 	}
 
 }

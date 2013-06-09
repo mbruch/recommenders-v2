@@ -25,13 +25,13 @@ public interface IMappingProvider extends IMappingStrategy {
 
     void setStrategies(List<IMappingStrategy> strategies);
 
-    void mapManually(DependencyInfo dependencyInfo, ProjectCoordinate projectCoordinate);
+    void setManualMapping(DependencyInfo dependencyInfo, ProjectCoordinate projectCoordinate);
     
-    void removeMapping(DependencyInfo dependencyInfo);
+    void removeManualMapping(DependencyInfo dependencyInfo);
     
     boolean isManualMapping(DependencyInfo dependencyInfo);
     
-    void storeMappings();
+    void storeManualMappings();
 
-    void loadMappings();
+    void loadManualMappings();
 }
