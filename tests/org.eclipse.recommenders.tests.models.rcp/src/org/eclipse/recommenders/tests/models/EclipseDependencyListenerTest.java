@@ -13,6 +13,9 @@ package org.eclipse.recommenders.tests.models;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +37,7 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
 import org.eclipse.recommenders.models.dependencies.rcp.EclipseDependencyListener;
+import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JarPackageFragmentRootAdded;
 import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JarPackageFragmentRootRemoved;
 import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectClosed;
 import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectOpened;
@@ -47,7 +51,8 @@ import com.google.common.eventbus.EventBus;
 public class EclipseDependencyListenerTest {
 
     private static String PROJECT_NAME = "TestProject";
-
+    private static final File JAR_FILE_EXAMPLE = new File("example.jar");
+    
     private EventBus eventBus;
     private EclipseDependencyListener sut;
 
@@ -58,6 +63,10 @@ public class EclipseDependencyListenerTest {
         return PROJECT_NAME + projectNumber;
     }
 
+    private IJavaProject createProject() throws Exception {
+    	return createProject(generateProjectName());
+    }
+    
     private IJavaProject createProject(String projectName) throws Exception {
     	IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IProject project = workspaceRoot.getProject(projectName);
@@ -84,6 +93,13 @@ public class EclipseDependencyListenerTest {
     	javaProject.open(null);
     	return javaProject;
     }
+    
+    private JarPackageFragmentRoot mockJarPackageFragmentRoot(IJavaProject javaProject, File file) {
+		JarPackageFragmentRoot mock = mock(JarPackageFragmentRoot.class, RETURNS_DEEP_STUBS);
+		when(mock.getParent()).thenReturn(javaProject);		
+		when(mock.getPath().toFile()).thenReturn(file);
+		return mock;
+	}
     
     @Before
     public void init() throws IOException {
@@ -198,16 +214,27 @@ public class EclipseDependencyListenerTest {
     	assertFalse(sut.getDependenciesForProject(projectDependencyInfo).contains(expectedJREDependencyInfo));
     }
     
-//    @Test
-//    public void testDependencyForJarIsAddedCorrect() throws Exception{
-//    	// TODO:
-//    	fail();
-//    }
-//    
-//    @Test
-//    public void testDependencyForJarIsRemovedCorrect() throws Exception{
-//    	// TODO:
-//    	fail();
-//    }
+    @Test
+    public void testDependencyForJarIsAddedCorrect() throws Exception{
+    	IJavaProject javaProject = createProject();
+    	DependencyInfo projectDependencyInfo = EclipseDependencyListener.createDependencyInfoForProject(javaProject);
+    	
+    	eventBus.post(new JarPackageFragmentRootAdded(mockJarPackageFragmentRoot(javaProject, JAR_FILE_EXAMPLE)));
+    	DependencyInfo expected = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
+
+    	assertTrue(sut.getDependenciesForProject(projectDependencyInfo).contains(expected));
+    }
+    
+	@Test
+    public void testDependencyForJarIsRemovedCorrect() throws Exception{
+    	IJavaProject javaProject = createProject();
+    	DependencyInfo projectDependencyInfo = EclipseDependencyListener.createDependencyInfoForProject(javaProject);
+    	
+    	eventBus.post(new JarPackageFragmentRootAdded(mockJarPackageFragmentRoot(javaProject, JAR_FILE_EXAMPLE)));
+    	DependencyInfo expected = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
+    	eventBus.post(new JarPackageFragmentRootRemoved(mockJarPackageFragmentRoot(javaProject, JAR_FILE_EXAMPLE)));
+    	    	
+    	assertFalse(sut.getDependenciesForProject(projectDependencyInfo).contains(expected));
+    }
 
 }

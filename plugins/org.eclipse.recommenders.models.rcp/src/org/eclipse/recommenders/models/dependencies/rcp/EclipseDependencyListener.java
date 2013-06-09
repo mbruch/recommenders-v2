@@ -34,13 +34,12 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
 import org.eclipse.recommenders.models.dependencies.IDependencyListener;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectClosed;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectOpened;
 import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JarPackageFragmentRootAdded;
 import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JarPackageFragmentRootRemoved;
+import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectClosed;
+import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectOpened;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Constraint;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -184,11 +183,10 @@ public class EclipseDependencyListener implements IDependencyListener {
 		if (!isJREOfProjectIsKnown(dependencyInfoForProject)) {
 			workspaceDependenciesByProject.removeAll(dependencyInfoForProject);
 			registerDependenciesForJavaProject(javaProject);
-		} else {
-			if (!isPartOfTheJRE(root)) {
-				DependencyInfo dependencyInfo = createDependencyInfoForJAR(root);
-				workspaceDependenciesByProject.put(dependencyInfoForProject, dependencyInfo);
-			}
+		}
+		if (!isPartOfTheJRE(root)) {
+			DependencyInfo dependencyInfo = createDependencyInfoForJAR(root);
+			workspaceDependenciesByProject.put(dependencyInfoForProject, dependencyInfo);
 		}
 	}
 
@@ -269,16 +267,5 @@ public class EclipseDependencyListener implements IDependencyListener {
 		Set<DependencyInfo> projectDependencies = workspaceDependenciesByProject.get(project);
 		return ImmutableSet.copyOf(projectDependencies);
 	}
-
-	public Constraint<DependencyInfo> projectDependencyInfo = new Constraint<DependencyInfo>() {
-
-		@Override
-		public DependencyInfo checkElement(DependencyInfo arg0) {
-			if (arg0.getType() == DependencyType.PROJECT) {
-				return arg0;
-			}
-			throw new IllegalArgumentException();
-		}
-	};
 
 }
