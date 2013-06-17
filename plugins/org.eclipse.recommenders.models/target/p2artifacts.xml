@@ -1,19 +1,19 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <?artifactRepository version='1.1.0'?>
 <artifacts size='2'>
-  <artifact classifier='osgi.bundle' id='org.eclipse.recommenders.models' version='1.100.0.v20130605-1547-b000'>
+  <artifact classifier='osgi.bundle' id='org.eclipse.recommenders.models' version='1.100.0.v20130617-1833-b000'>
     <properties size='5'>
-      <property name='artifact.size' value='57604'/>
-      <property name='download.size' value='57604'/>
+      <property name='artifact.size' value='57862'/>
+      <property name='download.size' value='57862'/>
       <property name='maven-groupId' value='org.eclipse.recommenders'/>
       <property name='maven-artifactId' value='org.eclipse.recommenders.models'/>
       <property name='maven-version' value='1.100.0-SNAPSHOT'/>
     </properties>
   </artifact>
-  <artifact classifier='osgi.bundle' id='org.eclipse.recommenders.models.source' version='1.100.0.v20130605-1547-b000'>
+  <artifact classifier='osgi.bundle' id='org.eclipse.recommenders.models.source' version='1.100.0.v20130617-1833-b000'>
     <properties size='6'>
-      <property name='artifact.size' value='31291'/>
-      <property name='download.size' value='31291'/>
+      <property name='artifact.size' value='31351'/>
+      <property name='download.size' value='31351'/>
       <property name='maven-groupId' value='org.eclipse.recommenders'/>
       <property name='maven-artifactId' value='org.eclipse.recommenders.models'/>
       <property name='maven-version' value='1.100.0-SNAPSHOT'/>

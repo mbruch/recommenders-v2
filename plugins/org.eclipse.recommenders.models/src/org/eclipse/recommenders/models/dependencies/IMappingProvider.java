@@ -11,6 +11,7 @@
 package org.eclipse.recommenders.models.dependencies;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.recommenders.models.ProjectCoordinate;
 
@@ -31,7 +32,7 @@ public interface IMappingProvider extends IMappingStrategy {
     
     boolean isManualMapping(DependencyInfo dependencyInfo);
     
-    void storeManualMappings();
+    void setManualMappings(Map<DependencyInfo, ProjectCoordinate> manualMappings);
 
-    void loadManualMappings();
+    Map<DependencyInfo, ProjectCoordinate> getManualMappings();
 }

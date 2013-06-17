@@ -11,8 +11,8 @@ Require-Bundle: org.eclipse.jdt.core,org.eclipse.core.runtime,org.ecli
 Bundle-Vendor: Eclipse Code Recommenders
 Eclipse-SourceReferences: scm:git:http://git.eclipse.org/gitroot/recom
  menders/org.eclipse.recommenders.git;path="plugins/org.eclipse.recomm
- enders.utils.rcp";commitId=3a659260f51672c7558bea7a50cc26e2f30c5960
-Bundle-Version: 1.100.0.v20130605-1547-b000
+ enders.utils.rcp";commitId=8d98e86946ccfa8d90b92fd4f01568fe8d10f5e6
+Bundle-Version: 1.100.0.v20130617-1833-b000
 Bundle-ManifestVersion: 2
 Bundle-Activator: org.eclipse.recommenders.utils.rcp.internal.Recommen
  dersUtilsPlugin

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="5.6">
-<file name="D:\!CoRe\github-Git\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\FingerprintStrategyTest.java">
+<file name="D:\!CoRe\!Gits\github\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\FingerprintStrategyTest.java">
 </file>
-<file name="D:\!CoRe\github-Git\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\JREIDEVersionStrategyTest.java">
+<file name="D:\!CoRe\!Gits\github\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\JREIDEVersionStrategyTest.java">
 </file>
-<file name="D:\!CoRe\github-Git\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\JREReleaseFileStrategyTest.java">
+<file name="D:\!CoRe\!Gits\github\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\JREReleaseFileStrategyTest.java">
 </file>
-<file name="D:\!CoRe\github-Git\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\MappingProviderTest.java">
+<file name="D:\!CoRe\!Gits\github\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\MappingProviderTest.java">
 </file>
-<file name="D:\!CoRe\github-Git\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\MavenPomPropertiesStrategyTest.java">
+<file name="D:\!CoRe\!Gits\github\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\MavenPomPropertiesStrategyTest.java">
 </file>
-<file name="D:\!CoRe\github-Git\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\utils\IFileToJarFileConverterMockBuilder.java">
+<file name="D:\!CoRe\!Gits\github\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\utils\IFileToJarFileConverterMockBuilder.java">
 </file>
-<file name="D:\!CoRe\github-Git\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\utils\JarFileMockBuilder.java">
+<file name="D:\!CoRe\!Gits\github\tests\org.eclipse.recommenders.tests.models\src\org\eclipse\recommenders\tests\models\utils\JarFileMockBuilder.java">
 </file>
 </checkstyle>

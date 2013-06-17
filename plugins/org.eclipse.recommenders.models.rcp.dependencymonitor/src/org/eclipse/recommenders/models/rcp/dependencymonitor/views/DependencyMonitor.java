@@ -1,24 +1,10 @@
 package org.eclipse.recommenders.models.rcp.dependencymonitor.views;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.launching.IVMInstall;
-import org.eclipse.jdt.launching.JavaRuntime;
-import org.eclipse.jdt.launching.LibraryLocation;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -26,19 +12,18 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.recommenders.injection.InjectionService;
 import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
-import org.eclipse.recommenders.models.dependencies.IDependencyListener;
 import org.eclipse.recommenders.models.dependencies.impl.JREIDEVersionStrategy;
 import org.eclipse.recommenders.models.dependencies.impl.JREReleaseFileStrategy;
 import org.eclipse.recommenders.models.dependencies.impl.MappingProvider;
 import org.eclipse.recommenders.models.dependencies.impl.MavenPomPropertiesStrategy;
 import org.eclipse.recommenders.models.dependencies.rcp.EclipseDependencyListener;
-import org.eclipse.recommenders.rcp.events.JavaModelEvents.JarPackageFragmentRootAdded;
-import org.eclipse.recommenders.rcp.events.JavaModelEvents.JarPackageFragmentRootRemoved;
-import org.eclipse.recommenders.rcp.events.JavaModelEvents.JavaProjectClosed;
-import org.eclipse.recommenders.rcp.events.JavaModelEvents.JavaProjectOpened;
+import org.eclipse.recommenders.models.dependencies.rcp.JavaModelEventsProvider;
+import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JarPackageFragmentRootAdded;
+import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JarPackageFragmentRootRemoved;
+import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectClosed;
+import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectOpened;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -53,9 +38,10 @@ import com.google.common.eventbus.Subscribe;
 public class DependencyMonitor extends ViewPart {
     private TableViewer viewer;
     private ViewContentProvider viewContentProvider;
-    private final EclipseDependencyListener eclipseDependencyListener;
+    private EclipseDependencyListener eclipseDependencyListener = null;
     private Composite parent;
     private final MappingProvider mp;
+	private EventBus eventBus;
 
     class ViewContentProvider implements IStructuredContentProvider {
         private DependencyInfo[] data = new DependencyInfo[0];
@@ -96,16 +82,17 @@ public class DependencyMonitor extends ViewPart {
     }
 
     public DependencyMonitor() {
-        mp = new MappingProvider();
-        mp.addStrategy(new MavenPomPropertiesStrategy());
-        mp.addStrategy(new JREReleaseFileStrategy());
-        mp.addStrategy(new JREIDEVersionStrategy());
-        
-        EventBus eventBus = InjectionService.getInstance().requestInstance(EventBus.class);
-        eventBus.register(this);
-        
-        IDependencyListener requestInstance = InjectionService.getInstance().requestInstance(IDependencyListener.class);
-        eclipseDependencyListener = (EclipseDependencyListener) requestInstance;
+		eventBus = new EventBus("org.eclipse.recommenders.models.rcp.eventbus");
+		eclipseDependencyListener = new EclipseDependencyListener(eventBus);
+		eventBus.register(this);
+		JavaModelEventsProvider javaModelEventsProvider = new JavaModelEventsProvider(
+				eventBus, ResourcesPlugin.getWorkspace().getRoot());
+		JavaCore.addElementChangedListener(javaModelEventsProvider);
+
+		mp = new MappingProvider();
+		mp.addStrategy(new MavenPomPropertiesStrategy());
+		mp.addStrategy(new JREReleaseFileStrategy());
+		mp.addStrategy(new JREIDEVersionStrategy());   
     }
     
     @Subscribe

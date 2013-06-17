@@ -11,6 +11,7 @@
 		<module>plugins/org.eclipse.recommenders.models.rcp</module>
 		<module>plugins/org.eclipse.recommenders.utils</module>
 		<module>plugins/org.eclipse.recommenders.utils.rcp</module>
+		<module>plugins/org.eclipse.recommenders.models.rcp.dependencymonitor</module>
 		<module>tests/org.eclipse.recommenders.tests.models</module>
 		<module>tests/org.eclipse.recommenders.tests.models.rcp</module>
 	</modules>

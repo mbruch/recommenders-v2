@@ -13,8 +13,9 @@ package org.eclipse.recommenders.models.dependencies.impl;
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.fromNullable;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import org.eclipse.recommenders.models.ProjectCoordinate;
@@ -27,94 +28,110 @@ import org.eclipse.recommenders.utils.annotations.Testing;
 import com.google.common.base.Optional;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class MappingProvider implements IMappingProvider {
 
-    private List<IMappingStrategy> strategies = Lists.newArrayList();
-    private Cache<DependencyInfo, Optional<ProjectCoordinate>> cache;
-    private HashMap<DependencyInfo, ProjectCoordinate> manualMappings = Maps.newHashMap(); 
+	private List<IMappingStrategy> strategies = Lists.newArrayList();
+	private Cache<DependencyInfo, Optional<ProjectCoordinate>> cache;
+	private Map<DependencyInfo, ProjectCoordinate> manualMappings = Maps
+			.newHashMap();
 
-    public MappingProvider() {
-        cache = CacheBuilder.newBuilder()
-                .maximumSize(200).recordStats()
-                .build();
-    }
+	public MappingProvider() {
+		cache = CacheBuilder.newBuilder().maximumSize(200).recordStats()
+				.build();
+	}
 
-    @Override
-    public List<IMappingStrategy> getStrategies() {
-        return strategies;
-    }
-
-    @Override
-    public void addStrategy(IMappingStrategy strategy) {
-        strategies.add(strategy);
-    }
-
-    @Override
-    public void setStrategies(List<IMappingStrategy> strategies) {
-        this.strategies = strategies;
-    }
-
-    @Override
-    public Optional<ProjectCoordinate> searchForProjectCoordinate(final DependencyInfo dependencyInfo) {
-        try {
-        	return cache.get(dependencyInfo, new Callable<Optional<ProjectCoordinate>>() {
-
-				@Override
-				public Optional<ProjectCoordinate> call() throws Exception {
-					return extractProjectCoordinate(dependencyInfo);
-				}
-			});
-        } catch (Exception e) {
-            return absent();
-        }
-    }
-
-    private Optional<ProjectCoordinate> extractProjectCoordinate(DependencyInfo dependencyInfo) {
-        for (IMappingStrategy strategy : strategies) {
-            Optional<ProjectCoordinate> optionalProjectCoordinate = strategy.searchForProjectCoordinate(dependencyInfo);
-            if (optionalProjectCoordinate.isPresent()) {
-                return optionalProjectCoordinate;
-            }
-        }
-        return absent();
-    }
-
-    @Override
-    public boolean isApplicable(DependencyType dependencyTyp) {
-        for (IMappingStrategy mappingStrategy : strategies) {
-            if (mappingStrategy.isApplicable(dependencyTyp)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public void storeManualMappings() {
-        // TODO: Store mappings when the IDE is closing
-    }
-
-    @Override
-    public void loadManualMappings() {
-        // TODO: Load mappings when the IDE starts
-        // TODO: Needed at least guava 11.0.2, to load stored mappings into the cache.
-    }
-    
-    @Testing
-    public long getMissCount(){
-    	return cache.stats().missCount();
-    }
-    
-    @Testing
-    public long getHitCount(){
-    	return cache.stats().hitCount();
-    }
+	public MappingProvider(Map<DependencyInfo, ProjectCoordinate> manualMappings) {
+		this();
+		setManualMappings(manualMappings);
+	}
 
 	@Override
-	public void setManualMapping(DependencyInfo dependencyInfo, ProjectCoordinate projectCoordinate) {
+	public List<IMappingStrategy> getStrategies() {
+		return ImmutableList.copyOf(strategies);
+	}
+
+	@Override
+	public void addStrategy(IMappingStrategy strategy) {
+		strategies.add(strategy);
+	}
+
+	@Override
+	public void setStrategies(List<IMappingStrategy> strategies) {
+		this.strategies = strategies;
+	}
+
+	@Override
+	public Optional<ProjectCoordinate> searchForProjectCoordinate(
+			final DependencyInfo dependencyInfo) {
+		try {
+			return cache.get(dependencyInfo,
+					new Callable<Optional<ProjectCoordinate>>() {
+
+						@Override
+						public Optional<ProjectCoordinate> call()
+								throws Exception {
+							return extractProjectCoordinate(dependencyInfo);
+						}
+					});
+		} catch (Exception e) {
+			return absent();
+		}
+	}
+
+	private Optional<ProjectCoordinate> extractProjectCoordinate(
+			DependencyInfo dependencyInfo) {
+		for (IMappingStrategy strategy : strategies) {
+			Optional<ProjectCoordinate> optionalProjectCoordinate = strategy
+					.searchForProjectCoordinate(dependencyInfo);
+			if (optionalProjectCoordinate.isPresent()) {
+				return optionalProjectCoordinate;
+			}
+		}
+		return absent();
+	}
+
+	@Override
+	public boolean isApplicable(DependencyType dependencyTyp) {
+		for (IMappingStrategy mappingStrategy : strategies) {
+			if (mappingStrategy.isApplicable(dependencyTyp)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void setManualMappings(
+			Map<DependencyInfo, ProjectCoordinate> manualMappings) {
+		this.manualMappings.clear();
+		for (Entry<DependencyInfo, ProjectCoordinate> entry : manualMappings.entrySet()) {
+			setManualMapping(entry.getKey(), entry.getValue());
+		}
+	}
+
+	@Override
+	public Map<DependencyInfo, ProjectCoordinate> getManualMappings() {
+		return ImmutableMap.copyOf(manualMappings);
+	}
+
+	@Testing
+	public long getMissCount() {
+		return cache.stats().missCount();
+	}
+
+	@Testing
+	public long getHitCount() {
+		return cache.stats().hitCount();
+	}
+
+	@Override
+	public void setManualMapping(DependencyInfo dependencyInfo,
+			ProjectCoordinate projectCoordinate) {
 		manualMappings.put(dependencyInfo, projectCoordinate);
 		cache.put(dependencyInfo, fromNullable(projectCoordinate));
 	}

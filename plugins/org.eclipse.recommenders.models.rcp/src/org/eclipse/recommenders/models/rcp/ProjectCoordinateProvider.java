@@ -1,6 +1,6 @@
 package org.eclipse.recommenders.models.rcp;
 
-import static com.google.common.base.Optional.*;
+import static com.google.common.base.Optional.absent;
 import static org.eclipse.jdt.core.IJavaElement.PACKAGE_FRAGMENT_ROOT;
 import static org.eclipse.recommenders.utils.Checks.cast;
 import static org.eclipse.recommenders.utils.rcp.JdtUtils.getLocation;
@@ -16,13 +16,22 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
+import org.eclipse.recommenders.models.dependencies.IMappingProvider;
 
 import com.google.common.base.Optional;
 
 public class ProjectCoordinateProvider {
 
-    // TODO: keep an eye on performance. maybe this class should use a cache too.
+	private IMappingProvider mappingProvider;
 
+	public ProjectCoordinateProvider(){
+		
+	}
+	
+	public ProjectCoordinateProvider(IMappingProvider mappingProvider){
+		this.mappingProvider = mappingProvider;
+	}
+	
     public Optional<ProjectCoordinate> resolve(ITypeBinding binding) {
         if (binding == null) {
             return absent();
@@ -74,8 +83,7 @@ public class ProjectCoordinateProvider {
     }
 
     public Optional<ProjectCoordinate> resolve(DependencyInfo info) {
-        // TODO Mapping strategies... do some magic!
-        return of(ProjectCoordinate.UNKNOWN);
+    	return mappingProvider.searchForProjectCoordinate(info);
     }
 
 }
