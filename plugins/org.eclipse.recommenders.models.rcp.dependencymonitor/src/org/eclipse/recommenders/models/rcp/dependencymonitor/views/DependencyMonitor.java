@@ -1,11 +1,22 @@
+/**
+ * Copyright (c) 2010, 2013 Darmstadt University of Technology.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Olav Lenz - initial API and implementation
+ */
 package org.eclipse.recommenders.models.rcp.dependencymonitor.views;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -20,6 +31,7 @@ import org.eclipse.recommenders.models.dependencies.impl.MappingProvider;
 import org.eclipse.recommenders.models.dependencies.impl.MavenPomPropertiesStrategy;
 import org.eclipse.recommenders.models.dependencies.rcp.EclipseDependencyListener;
 import org.eclipse.recommenders.models.dependencies.rcp.JavaModelEventsProvider;
+import org.eclipse.recommenders.models.rcp.dependencymonitor.Activator;
 import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JarPackageFragmentRootAdded;
 import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JarPackageFragmentRootRemoved;
 import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectClosed;
@@ -27,8 +39,7 @@ import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectOpen
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
 
 import com.google.common.base.Optional;
@@ -36,50 +47,18 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
 public class DependencyMonitor extends ViewPart {
-    private TableViewer viewer;
-    private ViewContentProvider viewContentProvider;
-    private EclipseDependencyListener eclipseDependencyListener = null;
-    private Composite parent;
-    private final MappingProvider mp;
+  
+	private static final int COLOUMN_DEPENDENCYTYP = 0;
+	private static final int COLOUMN_DEPENDENCYFILE = 1;
+	private static final int COLOUMN_PROJECTCOORDINATE = 2;
+	
+	private Composite parent;
+	private TableViewer tableViewer;
+	private ContentProvider contentProvider;
+
+	private EclipseDependencyListener eclipseDependencyListener;
+    private MappingProvider mappingProvider;
 	private EventBus eventBus;
-
-    class ViewContentProvider implements IStructuredContentProvider {
-        private DependencyInfo[] data = new DependencyInfo[0];
-
-        public void setData(Set<DependencyInfo> data) {
-            this.data = data.toArray(new DependencyInfo[0]);
-        }
-
-        @Override
-        public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-        }
-
-        @Override
-        public void dispose() {
-        }
-
-        @Override
-        public Object[] getElements(Object parent) {
-            return data;
-        }
-    }
-
-    class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
-        @Override
-        public String getColumnText(Object obj, int index) {
-            return getText(obj);
-        }
-
-        @Override
-        public Image getColumnImage(Object obj, int index) {
-            return getImage(obj);
-        }
-
-        @Override
-        public Image getImage(Object obj) {
-            return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
-        }
-    }
 
     public DependencyMonitor() {
 		eventBus = new EventBus("org.eclipse.recommenders.models.rcp.eventbus");
@@ -89,10 +68,10 @@ public class DependencyMonitor extends ViewPart {
 				eventBus, ResourcesPlugin.getWorkspace().getRoot());
 		JavaCore.addElementChangedListener(javaModelEventsProvider);
 
-		mp = new MappingProvider();
-		mp.addStrategy(new MavenPomPropertiesStrategy());
-		mp.addStrategy(new JREReleaseFileStrategy());
-		mp.addStrategy(new JREIDEVersionStrategy());   
+		mappingProvider = new MappingProvider();
+		mappingProvider.addStrategy(new MavenPomPropertiesStrategy());
+		mappingProvider.addStrategy(new JREReleaseFileStrategy());
+		mappingProvider.addStrategy(new JREIDEVersionStrategy());   
     }
     
     @Subscribe
@@ -118,10 +97,11 @@ public class DependencyMonitor extends ViewPart {
     protected void checkForDependencyUpdates() {
         parent.getDisplay().syncExec(new Runnable() {
 
-            @Override
+			@Override
             public void run() {
-                viewContentProvider.setData(eclipseDependencyListener.getDependencies());
-                viewer.refresh();
+				contentProvider.setData(eclipseDependencyListener.getDependencies());
+				tableViewer.setLabelProvider(new ViewLabelProvider());
+				tableViewer.refresh();
             }
         });
     }
@@ -129,41 +109,29 @@ public class DependencyMonitor extends ViewPart {
     @Override
     public void createPartControl(Composite parent) {
         this.parent = parent;
-        viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-        viewer.getTable().setHeaderVisible(true);
-        viewer.getTable().setLinesVisible(true);
-        viewContentProvider = new ViewContentProvider();
-        viewContentProvider.setData(new HashSet<DependencyInfo>());
-        viewer.setContentProvider(viewContentProvider);
-        viewer.setLabelProvider(new ViewLabelProvider());
-        viewer.setInput(getViewSite());
+		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+		tableViewer.setLabelProvider(new ViewLabelProvider());
+		contentProvider = new ContentProvider();
+		tableViewer.setContentProvider(contentProvider);
+		tableViewer.setInput(getViewSite());
 
-        TableViewerColumn dependencyInfo = new TableViewerColumn(viewer, SWT.NONE);
-        dependencyInfo.getColumn().setWidth(200);
-        dependencyInfo.getColumn().setText("DependencyInfo:");
-        dependencyInfo.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                return element.toString();
-            }
-        });
+		tableViewer.getTable().setHeaderVisible(true);
+		tableViewer.getTable().setLinesVisible(true);
 
-        TableViewerColumn projectCoordinate = new TableViewerColumn(viewer, SWT.NONE);
-        projectCoordinate.getColumn().setWidth(200);
-        projectCoordinate.getColumn().setText("ProjectCoordinate:");
-        projectCoordinate.setLabelProvider(new ColumnLabelProvider() {
-            @Override
-            public String getText(Object element) {
-                if (element instanceof DependencyInfo){
-                    DependencyInfo di = (DependencyInfo) element;
-                    Optional<ProjectCoordinate> searchForProjectCoordinate = mp.searchForProjectCoordinate(di);
-                    if (searchForProjectCoordinate.isPresent()){
-                        return searchForProjectCoordinate.get().toString();
-                    } 
-                }
-                return "------";
-            }
-        });
+		TableViewerColumn tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+		TableColumn tableColumn = tableViewerColumn.getColumn();
+		tableColumn.setText("Type");
+		tableColumn.setWidth(75);
+
+		tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+		tableColumn = tableViewerColumn.getColumn();
+		tableColumn.setText("File");
+		tableColumn.setWidth(200);
+
+		tableViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+		tableColumn = tableViewerColumn.getColumn();
+		tableColumn.setText("ProjectCoordinate");
+		tableColumn.setWidth(200);
         
         checkForDependencyUpdates();
 
@@ -171,6 +139,89 @@ public class DependencyMonitor extends ViewPart {
 
     @Override
     public void setFocus() {
-        viewer.getControl().setFocus();
+    	tableViewer.getControl().setFocus();
     }
+    
+    class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
+		public String getColumnText(Object obj, int index) {
+			if (obj instanceof DependencyInfo){
+				DependencyInfo dependencyInfo = (DependencyInfo) obj;
+				switch(index){
+				case COLOUMN_DEPENDENCYTYP:
+					return dependencyInfo.getType().toString();
+				case COLOUMN_DEPENDENCYFILE:
+					return dependencyInfo.getFile().getName();
+				case COLOUMN_PROJECTCOORDINATE:
+					Optional<ProjectCoordinate> optionalProjectCoordinate = mappingProvider.searchForProjectCoordinate(dependencyInfo);
+					if (optionalProjectCoordinate.isPresent()){
+						return optionalProjectCoordinate.get().toString();						
+					}
+				default:
+					return "";
+				}
+			}
+			return "";
+		}
+
+		public Image getColumnImage(Object obj, int index) {
+			if (obj instanceof DependencyInfo){
+				DependencyInfo dependencyInfo = (DependencyInfo) obj;
+				switch(index){
+				case COLOUMN_DEPENDENCYTYP:
+					return getImageForDependencyTyp(dependencyInfo);
+				default:
+					return null;
+				}
+			}
+			return null;
+		}
+
+		private Image getImageForDependencyTyp(DependencyInfo dependencyInfo) {
+			switch(dependencyInfo.getType()){
+			case JRE:
+				return loadImage("icons/cview16/classpath.gif");
+			case JAR:
+				return loadImage("icons/cview16/jar_obj.gif");				
+			case PROJECT:
+				return loadImage("icons/cview16/projects.gif");
+			default:
+				return null;
+			}
+		}
+		
+		private Image loadImage(String name){
+			ImageDescriptor imageDescriptor = Activator.getImageDescriptor(name);
+			if (imageDescriptor != null){
+				Image image = imageDescriptor.createImage();
+				return image;
+			}
+			return null;
+		}
+	}
+    
+	class ContentProvider implements IStructuredContentProvider{
+
+		private List<DependencyInfo> data = new ArrayList<DependencyInfo>();
+
+		public void setData(Set<DependencyInfo> dependencyInfos){
+			data.addAll(dependencyInfos);
+		}
+				
+		@Override
+		public void dispose() {
+			// unused in this case
+		}
+
+		@Override
+		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+			// unused in this case
+		}
+
+		@Override
+		public Object[] getElements(Object inputElement) {
+			return data.toArray();
+		}
+		
+	}
+
 }
