@@ -5,8 +5,8 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            name="DependencyMonitor"
-            icon="icons/sample.gif"
+            name="Dependency Identification"
+            icon="icons/depinsp.gif"
             category="org.eclipse.recommenders.models.rcp.dependencymonitor.view"
             class="org.eclipse.recommenders.models.rcp.dependencymonitor.views.DependencyMonitor"
             id="org.eclipse.recommenders.models.rcp.dependencymonitor.views.DependencyMonitor">
@@ -15,18 +15,6 @@
             id="org.eclipse.recommenders.models.rcp.dependencymonitor.view"
             name="Code Recommenders">
       </category>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="org.eclipse.jdt.ui.JavaPerspective">
-         <view
-               ratio="0.5"
-               relative="org.eclipse.ui.views.ProblemView"
-               relationship="right"
-               id="org.eclipse.recommenders.models.rcp.dependencymonitor.views.DependencyMonitor">
-         </view>
-      </perspectiveExtension>
    </extension>
 
 </plugin>

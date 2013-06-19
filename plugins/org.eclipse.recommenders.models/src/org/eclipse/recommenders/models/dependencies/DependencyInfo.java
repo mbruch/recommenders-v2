@@ -20,6 +20,7 @@ import org.eclipse.recommenders.utils.Checks;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 public class DependencyInfo {
 
@@ -50,6 +51,10 @@ public class DependencyInfo {
 
 	public Optional<String> getAttribute(String key) {
 		return Optional.fromNullable(attributes.get(key));
+	}
+	
+	public Map<String, String> getAttributeMap(){
+		return ImmutableMap.copyOf(attributes);
 	}
 
 	@Override

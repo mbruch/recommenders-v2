@@ -18,7 +18,7 @@ import com.google.common.base.Optional;
  * Strategy for extract the ProjectCoordinate of a element.
  */
 public interface IMappingStrategy {
-
+	
     Optional<ProjectCoordinate> searchForProjectCoordinate(DependencyInfo dependencyInfo);
 
     boolean isApplicable(DependencyType dependencyType);
