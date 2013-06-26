@@ -1,9 +1,28 @@
-*.class
-
-bin/
-lib/
-
-# Package Files #
+## Ignore archives
 *.jar
-*.war
-*.ear
+*.zip
+*.gz
+
+## Ignore derived resources
+*.class
+bin/
+target/
+.recommenders/
+aggregators/
+screenshots/
+
+## Eclipse configuration is also derived from POMs
+.classpath
+.project
+.settings/
+
+## various other file types we don't want to have in the repository:
+.DS_Store
+*~
+*#
+*.licensed
+*.aux
+*_trace
+
+# Ignore eclipse/xtend debugging help files 
+*.smap
