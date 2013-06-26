@@ -4,10 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.eclipse.recommenders</groupId>
-		<artifactId>plugins</artifactId>
-		<version>1.100.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
+		<artifactId>org.eclipse.recommenders.parent</artifactId>
+		<version>1.0.4-SNAPSHOT</version>
 	</parent>
-	<artifactId>org.eclipse.recommenders.utils.rcp</artifactId>
-	<packaging>eclipse-plugin</packaging>
+	<artifactId>targets</artifactId>
+	<packaging>pom</packaging>
+	<modules>
+		<module>v2e43</module>
+	</modules>
 </project>
