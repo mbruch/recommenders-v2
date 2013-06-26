@@ -8,7 +8,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.recommenders.models.rcp,
  org.eclipse.recommenders.models,
- org.eclipse.recommenders.utils.rcp,
+ org.eclipse.recommenders.utils.rcp;bundle-version="[1.100.0,2.0.0)",
  org.eclipse.core.resources,
  org.eclipse.jdt.core,
  org.eclipse.jdt.launching

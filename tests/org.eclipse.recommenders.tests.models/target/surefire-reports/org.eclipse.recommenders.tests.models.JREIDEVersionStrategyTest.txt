@@ -1,5 +1,0 @@
--------------------------------------------------------------------------------
-Test set: org.eclipse.recommenders.tests.models.JREIDEVersionStrategyTest
--------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.01 sec
-testValidJRE(org.eclipse.recommenders.tests.models.JREIDEVersionStrategyTest)  Time elapsed: 0.01 sectestNotSupportedType(org.eclipse.recommenders.tests.models.JREIDEVersionStrategyTest)  Time elapsed: 0 sectestMissingInformation(org.eclipse.recommenders.tests.models.JREIDEVersionStrategyTest)  Time elapsed: 0 sec
