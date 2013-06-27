@@ -160,7 +160,7 @@ public class DependencyMonitor extends ViewPart {
 		coordinateColumn = new TableViewerColumn(tableViewer, SWT.NONE);
 		tableColumn = coordinateColumn.getColumn();
 		tableColumn.setText("Coordinate");
-		tableColumn.setWidth(200);
+		tableColumn.setWidth(450);
 		tableColumn.addSelectionListener(new SelectionListener(tableColumn, 1));
 
 		tableViewer.getTable().setSortDirection(SWT.UP);
@@ -335,11 +335,18 @@ public class DependencyMonitor extends ViewPart {
 				}
 				sb.append(strategy.getClass().getSimpleName());
 				sb.append(": ");
-				Optional<ProjectCoordinate> optionalCoordinate = strategy
-						.searchForProjectCoordinate(dependencyInfo);
-				if (optionalCoordinate.isPresent()) {
-					sb.append(optionalCoordinate.get().toString());
+				if (!strategy.isApplicable(dependencyInfo.getType())){
+					sb.append("n/a");
+				}else{
+					Optional<ProjectCoordinate> optionalCoordinate = strategy
+							.searchForProjectCoordinate(dependencyInfo);
+					if (optionalCoordinate.isPresent()) {
+						sb.append(optionalCoordinate.get().toString());
+					}else{
+						sb.append("unknown");
+					}
 				}
+				
 			}
 			return sb.toString();
 		}
