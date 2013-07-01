@@ -5,39 +5,33 @@
 	<parent>
 		<groupId>org.eclipse.recommenders</groupId>
 		<artifactId>org.eclipse.recommenders.parent</artifactId>
-		<version>1.0.4-SNAPSHOT</version>
+		<version>1.100.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>tests</artifactId>
-	<version>1.100.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
 		<module>org.eclipse.recommenders.tests.models</module>
 		<module>org.eclipse.recommenders.tests.models.rcp</module>
 	</modules>
-	
-	<profiles>
-		<profile>
-			<id>v2e43</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.eclipse.tycho</groupId>
-						<artifactId>target-platform-configuration</artifactId>
-						<configuration>
-							<target>
-								<artifact>
-									<groupId>${project.groupId}</groupId>
-									<artifactId>v2e43</artifactId>
-									<version>1.100.0-SNAPSHOT</version>
-								</artifact>
-							</target>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
-	
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<configuration>
+					<target>
+						<artifact>
+							<groupId>${project.groupId}</groupId>
+							<artifactId>v2e43</artifactId>
+							<version>1.100.0-SNAPSHOT</version>
+						</artifact>
+					</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
