@@ -32,8 +32,9 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
+import org.eclipse.recommenders.models.dependencies.DependencyType;
 import org.eclipse.recommenders.models.dependencies.IMappingStrategy;
-import org.eclipse.recommenders.models.dependencies.impl.JREIDEVersionStrategy;
+import org.eclipse.recommenders.models.dependencies.impl.JREExecutionEnvironmentStrategy;
 import org.eclipse.recommenders.models.dependencies.impl.JREReleaseFileStrategy;
 import org.eclipse.recommenders.models.dependencies.impl.MappingProvider;
 import org.eclipse.recommenders.models.dependencies.impl.MavenPomPropertiesStrategy;
@@ -84,8 +85,8 @@ public class DependencyMonitor extends ViewPart {
 
 		mappingProvider = new MappingProvider();
 		mappingProvider.addStrategy(new MavenPomPropertiesStrategy());
+		mappingProvider.addStrategy(new JREExecutionEnvironmentStrategy());
 		mappingProvider.addStrategy(new JREReleaseFileStrategy());
-		mappingProvider.addStrategy(new JREIDEVersionStrategy());
 	}
 
 	@Subscribe
@@ -181,6 +182,12 @@ public class DependencyMonitor extends ViewPart {
 				DependencyInfo dependencyInfo = (DependencyInfo) obj;
 				switch (index) {
 				case COLUMN_LOCATION:
+					if (dependencyInfo.getType() == DependencyType.JRE){
+						Optional<String> executionEnvironment = dependencyInfo.getAttribute(DependencyInfo.EXECUTION_ENVIRONMENT);
+						if (executionEnvironment.isPresent()){
+							return executionEnvironment.get();
+						}
+					}
 					return dependencyInfo.getFile().getName();
 				case COLUMN_COORDINATE:
 					Optional<ProjectCoordinate> optionalProjectCoordinate = mappingProvider
@@ -298,7 +305,11 @@ public class DependencyMonitor extends ViewPart {
 		protected String generateTooltip(DependencyInfo dependencyInfo) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("Location: ");
-			sb.append(dependencyInfo.getFile().getAbsolutePath());
+			if (dependencyInfo.getType() == DependencyType.PROJECT){
+				sb.append(dependencyInfo.getFile().getPath());				
+			}else{
+				sb.append(dependencyInfo.getFile().getAbsolutePath());
+			}
 			sb.append(System.getProperty("line.separator"));
 
 			sb.append("Type: ");

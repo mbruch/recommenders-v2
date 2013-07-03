@@ -24,7 +24,8 @@ import com.google.common.collect.ImmutableMap;
 
 public class DependencyInfo {
 
-	public static final String JRE_VERSION_IDE = "JRE_VERSION_IDE";
+	public static final String EXECUTION_ENVIRONMENT = "EXECUTION_ENVIRONMENT";
+	public static final String EXECUTION_ENVIRONMENT_VERSION = "EXECUTION_ENVIRONMENT_VERSION";
 
 	private final File file;
 	private final DependencyType type;

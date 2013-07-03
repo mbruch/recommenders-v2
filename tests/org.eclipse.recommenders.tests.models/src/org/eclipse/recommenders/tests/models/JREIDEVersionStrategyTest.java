@@ -20,7 +20,7 @@ import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
 import org.eclipse.recommenders.models.dependencies.IMappingStrategy;
-import org.eclipse.recommenders.models.dependencies.impl.JREIDEVersionStrategy;
+import org.eclipse.recommenders.models.dependencies.impl.JREExecutionEnvironmentStrategy;
 import org.junit.Test;
 
 import com.google.common.base.Optional;
@@ -33,14 +33,14 @@ public class JREIDEVersionStrategyTest {
 
     private static Map<String, String> createAttributesMapForVersion(String version) {
         Map<String, String> attributes = Maps.newHashMap();
-        attributes.put(DependencyInfo.JRE_VERSION_IDE, version);
+        attributes.put(DependencyInfo.EXECUTION_ENVIRONMENT_VERSION, version);
         return attributes;
     }
 
     @Test
     public void testNotSupportedType() {
         DependencyInfo info = new DependencyInfo(JAVA_HOME_FOLDER, DependencyType.JAR);
-        IMappingStrategy sut = new JREIDEVersionStrategy();
+        IMappingStrategy sut = new JREExecutionEnvironmentStrategy();
 
         sut.searchForProjectCoordinate(info);
     }
@@ -48,7 +48,7 @@ public class JREIDEVersionStrategyTest {
     @Test
     public void testMissingInformation() {
         DependencyInfo info = new DependencyInfo(JAVA_HOME_FOLDER, DependencyType.JRE);
-        IMappingStrategy sut = new JREIDEVersionStrategy();
+        IMappingStrategy sut = new JREExecutionEnvironmentStrategy();
 
         Optional<ProjectCoordinate> extractProjectCoordinate = sut.searchForProjectCoordinate(info);
 
@@ -59,7 +59,7 @@ public class JREIDEVersionStrategyTest {
     public void testValidJRE() {
         DependencyInfo info = new DependencyInfo(JAVA_HOME_FOLDER, DependencyType.JRE,
                 createAttributesMapForVersion("1.0.0"));
-        IMappingStrategy sut = new JREIDEVersionStrategy();
+        IMappingStrategy sut = new JREExecutionEnvironmentStrategy();
 
         Optional<ProjectCoordinate> projectCoordinate = sut.searchForProjectCoordinate(info);
 
