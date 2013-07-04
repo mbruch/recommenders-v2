@@ -10,12 +10,13 @@
  */
 package org.eclipse.recommenders.calls.rcp;
 
-import static com.google.common.collect.Collections2.filter;
+import static com.google.common.collect.Iterables.isEmpty;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.lang.Math.rint;
 import static org.eclipse.recommenders.calls.rcp.Constants.*;
 import static org.eclipse.recommenders.internal.completion.rcp.ProcessableCompletionProposalComputer.NULL_PROPOSAL;
-import java.util.Collection;
+import static org.eclipse.recommenders.utils.Recommendations.top;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,6 +46,7 @@ import org.eclipse.recommenders.utils.Recommendations;
 import org.eclipse.recommenders.utils.names.IMethodName;
 import org.eclipse.recommenders.utils.names.ITypeName;
 import org.eclipse.recommenders.utils.rcp.JavaElementResolver;
+
 import com.google.common.collect.Lists;
 
 public class CallCompletionSessionProcessor extends SessionProcessor {
@@ -86,18 +88,18 @@ public class CallCompletionSessionProcessor extends SessionProcessor {
     private ProjectCoordinate projectCoordinate;
     private ICallModel model;
 
-    private Collection<Recommendation<IMethodName>> recommendations;
+    private Iterable<Recommendation<IMethodName>> recommendations;
 
     @Inject
-    public CallCompletionSessionProcessor(ProjectCoordinateProvider projectCoordinateProvider,
-            ICallModelProvider modelProvider, JavaElementResolver jdtResolver) {
+    public CallCompletionSessionProcessor(final ProjectCoordinateProvider projectCoordinateProvider,
+            final ICallModelProvider modelProvider, final JavaElementResolver jdtResolver) {
         this.jdtResolver = jdtResolver;
         this.projectCoordinateProvider = projectCoordinateProvider;
         this.modelProvider = modelProvider;
     }
 
     @Override
-    public void startSession(IRecommendersCompletionContext context) {
+    public void startSession(final IRecommendersCompletionContext context) {
         ctx = context;
         recommendations = Lists.newLinkedList();
         completionAnalyzer = new AstCallCompletionAnalyzer(context);
@@ -125,7 +127,7 @@ public class CallCompletionSessionProcessor extends SessionProcessor {
         receiverTypeName = jdtResolver.toRecType(receiverType);
         BasedTypeName name = new BasedTypeName(projectCoordinate, receiverTypeName);
         // TODO for testing
-        model = modelProvider.acquireModel(name).or(NullCallModel.NULL);
+        model = modelProvider.acquireModel(name).or(NullCallModel.NULL_MODEL);
         return model != null;
 
     }
@@ -141,8 +143,8 @@ public class CallCompletionSessionProcessor extends SessionProcessor {
         // set override-context:
         IMethod overrides = completionAnalyzer.getOverridesContext().orNull();
         if (overrides != null) {
-            IMethodName crOverrides = jdtResolver.toRecMethod(overrides)
-                    .or(org.eclipse.recommenders.utils.Constants.UNKNOWN_METHOD);
+            IMethodName crOverrides = jdtResolver.toRecMethod(overrides).or(
+                    org.eclipse.recommenders.utils.Constants.UNKNOWN_METHOD);
             model.setObservedOverrideContext(crOverrides);
         }
 
@@ -157,12 +159,13 @@ public class CallCompletionSessionProcessor extends SessionProcessor {
         model.setObservedCalls(newHashSet(completionAnalyzer.getCalls()));
 
         // read
-        recommendations = model.getRecommendedCalls(Recommendations.<IMethodName> topElementsSortedByRelevance(minProposalProbability,
-                maxNumberOfProposals));
+        recommendations = model.getRecommendedCalls();
+        // filter void methods if needed:
         if (ctx.getExpectedTypeSignature().isPresent()) {
-            recommendations = filter(recommendations, Recommendations.filterVoid());
+            recommendations = Recommendations.filterVoid(recommendations);
         }
-        return recommendations.isEmpty();
+        top(recommendations, maxNumberOfProposals, minProposalProbability);
+        return isEmpty(recommendations);
     }
 
     private void releaseModel() {
@@ -173,8 +176,8 @@ public class CallCompletionSessionProcessor extends SessionProcessor {
     }
 
     @Override
-    public void process(IProcessableProposal proposal) {
-        if (recommendations.isEmpty()) {
+    public void process(final IProcessableProposal proposal) {
+        if (isEmpty(recommendations)) {
             return;
         }
 

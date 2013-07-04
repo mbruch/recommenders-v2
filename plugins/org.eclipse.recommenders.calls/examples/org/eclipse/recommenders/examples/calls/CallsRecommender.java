@@ -1,6 +1,7 @@
 package org.eclipse.recommenders.examples.calls;
 
 import static org.eclipse.recommenders.utils.Constants.UNKNOWN_METHOD;
+import static org.eclipse.recommenders.utils.Recommendations.top;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,12 +9,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.recommenders.calls.ICallModel;
-import org.eclipse.recommenders.calls.OneZipCallModelProvider;
 import org.eclipse.recommenders.calls.ICallModel.DefinitionType;
+import org.eclipse.recommenders.calls.OneZipCallModelProvider;
 import org.eclipse.recommenders.models.BasedTypeName;
 import org.eclipse.recommenders.utils.Constants;
 import org.eclipse.recommenders.utils.Recommendation;
-import org.eclipse.recommenders.utils.Recommendations;
 import org.eclipse.recommenders.utils.names.IMethodName;
 import org.eclipse.recommenders.utils.names.ITypeName;
 
@@ -31,12 +31,12 @@ public class CallsRecommender {
 
     private final OneZipCallModelProvider store;
 
-    public CallsRecommender(File models) throws IOException {
+    public CallsRecommender(final File models) throws IOException {
         store = new OneZipCallModelProvider(models);
         store.open();
     }
 
-    public List<Recommendation<IMethodName>> computeRecommendations(ObjectUsage query) throws Exception {
+    public List<Recommendation<IMethodName>> computeRecommendations(final ObjectUsage query) throws Exception {
         BasedTypeName name = new BasedTypeName(null, query.type);
         ICallModel net = store.acquireModel(name).orNull();
         try {
@@ -47,7 +47,10 @@ public class CallsRecommender {
             }
             net.setObservedCalls(query.calls);
             // query the recommender:
-            return net.getRecommendedCalls(Recommendations.<IMethodName> topElementsSortedByRelevance(0.1d, 5));
+            List<Recommendation<String>> patterns = top(net.getRecommendedPatterns(), 10, 0.01);
+            List<Recommendation<IMethodName>> definitions = top(net.getRecommendedDefinitions(), 10);
+            return top(net.getRecommendedCalls(), 5, 0.01d);
+
         } finally {
             store.releaseModel(net);
         }

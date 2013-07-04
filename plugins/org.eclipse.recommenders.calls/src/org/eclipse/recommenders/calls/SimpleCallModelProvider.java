@@ -3,7 +3,6 @@ package org.eclipse.recommenders.calls;
 import static com.google.common.base.Optional.*;
 import static org.eclipse.recommenders.utils.IOUtils.closeQuietly;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -27,7 +26,7 @@ import com.google.common.base.Optional;
  */
 @Beta
 public class SimpleCallModelProvider extends SimpleModelProvider<BasedTypeName, ICallModel> implements
-        ICallModelProvider {
+ICallModelProvider {
 
     public SimpleCallModelProvider(ModelRepository cache, String modelType) {
         super(cache, modelType);

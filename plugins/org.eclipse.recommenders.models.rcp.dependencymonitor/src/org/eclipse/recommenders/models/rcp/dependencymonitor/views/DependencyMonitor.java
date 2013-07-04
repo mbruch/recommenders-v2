@@ -33,7 +33,7 @@ import org.eclipse.jface.window.ToolTip;
 import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
-import org.eclipse.recommenders.models.dependencies.IMappingStrategy;
+import org.eclipse.recommenders.models.dependencies.IProjectCoordinateResolver;
 import org.eclipse.recommenders.models.dependencies.impl.JREExecutionEnvironmentStrategy;
 import org.eclipse.recommenders.models.dependencies.impl.JREReleaseFileStrategy;
 import org.eclipse.recommenders.models.dependencies.impl.MappingProvider;
@@ -41,10 +41,10 @@ import org.eclipse.recommenders.models.dependencies.impl.MavenPomPropertiesStrat
 import org.eclipse.recommenders.models.dependencies.rcp.EclipseDependencyListener;
 import org.eclipse.recommenders.models.dependencies.rcp.JavaModelEventsProvider;
 import org.eclipse.recommenders.models.rcp.dependencymonitor.Activator;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JarPackageFragmentRootAdded;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JarPackageFragmentRootRemoved;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectClosed;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectOpened;
+import org.eclipse.recommenders.rcp.events.JavaModelEvents.JarPackageFragmentRootAdded;
+import org.eclipse.recommenders.rcp.events.JavaModelEvents.JarPackageFragmentRootRemoved;
+import org.eclipse.recommenders.rcp.events.JavaModelEvents.JavaProjectClosed;
+import org.eclipse.recommenders.rcp.events.JavaModelEvents.JavaProjectOpened;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -60,415 +60,414 @@ import com.google.common.eventbus.Subscribe;
 
 public class DependencyMonitor extends ViewPart {
 
-	private static final int COLUMN_LOCATION = 0;
-	private static final int COLUMN_COORDINATE = 1;
+    private static final int COLUMN_LOCATION = 0;
+    private static final int COLUMN_COORDINATE = 1;
 
-	private Composite parent;
-	private TableViewer tableViewer;
-	private ContentProvider contentProvider;
+    private Composite parent;
+    private TableViewer tableViewer;
+    private ContentProvider contentProvider;
 
-	private EclipseDependencyListener eclipseDependencyListener;
-	private MappingProvider mappingProvider;
-	private EventBus eventBus;
+    private EclipseDependencyListener eclipseDependencyListener;
+    private MappingProvider mappingProvider;
+    private EventBus eventBus;
 
-	private TableViewerColumn locationColumn;
-	private TableViewerColumn coordinateColumn;
-	private TableComparator comparator;
+    private TableViewerColumn locationColumn;
+    private TableViewerColumn coordinateColumn;
+    private TableComparator comparator;
 
-	public DependencyMonitor() {
-		eventBus = new EventBus("org.eclipse.recommenders.models.rcp.eventbus");
-		eclipseDependencyListener = new EclipseDependencyListener(eventBus);
-		eventBus.register(this);
-		JavaModelEventsProvider javaModelEventsProvider = new JavaModelEventsProvider(
-				eventBus, ResourcesPlugin.getWorkspace().getRoot());
-		JavaCore.addElementChangedListener(javaModelEventsProvider);
+    public DependencyMonitor() {
+        eventBus = new EventBus("org.eclipse.recommenders.models.rcp.eventbus");
+        eclipseDependencyListener = new EclipseDependencyListener(eventBus);
+        eventBus.register(this);
+        JavaModelEventsProvider javaModelEventsProvider = new JavaModelEventsProvider(eventBus, ResourcesPlugin
+                .getWorkspace().getRoot());
+        JavaCore.addElementChangedListener(javaModelEventsProvider);
 
-		mappingProvider = new MappingProvider();
-		mappingProvider.addStrategy(new MavenPomPropertiesStrategy());
-		mappingProvider.addStrategy(new JREExecutionEnvironmentStrategy());
-		mappingProvider.addStrategy(new JREReleaseFileStrategy());
-	}
+        mappingProvider = new MappingProvider();
+        mappingProvider.addStrategy(new MavenPomPropertiesStrategy());
+        mappingProvider.addStrategy(new JREExecutionEnvironmentStrategy());
+        mappingProvider.addStrategy(new JREReleaseFileStrategy());
+    }
 
-	@Subscribe
-	public void onEvent(final JavaProjectOpened e) {
-		checkForDependencyUpdates();
-	}
+    @Subscribe
+    public void onEvent(final JavaProjectOpened e) {
+        checkForDependencyUpdates();
+    }
 
-	@Subscribe
-	public void onEvent(final JavaProjectClosed e) {
-		checkForDependencyUpdates();
-	}
+    @Subscribe
+    public void onEvent(final JavaProjectClosed e) {
+        checkForDependencyUpdates();
+    }
 
-	@Subscribe
-	public void onEvent(final JarPackageFragmentRootAdded e) {
-		checkForDependencyUpdates();
-	}
+    @Subscribe
+    public void onEvent(final JarPackageFragmentRootAdded e) {
+        checkForDependencyUpdates();
+    }
 
-	@Subscribe
-	public void onEvent(final JarPackageFragmentRootRemoved e) {
-		checkForDependencyUpdates();
-	}
+    @Subscribe
+    public void onEvent(final JarPackageFragmentRootRemoved e) {
+        checkForDependencyUpdates();
+    }
 
-	protected void checkForDependencyUpdates() {
-		if (parent != null){
-			parent.getDisplay().syncExec(new Runnable() {
-				
-				@Override
-				public void run() {
-					contentProvider.setData(eclipseDependencyListener
-							.getDependencies());
-					refreshTable();
-				}
-				
-			});
-		}
-	}
+    protected void checkForDependencyUpdates() {
+        if (parent != null) {
+            parent.getDisplay().syncExec(new Runnable() {
 
-	protected void setLabelProviderForTooltips() {
-		locationColumn.setLabelProvider(new LocationTooltip());
-	}
+                @Override
+                public void run() {
+                    contentProvider.setData(eclipseDependencyListener.getDependencies());
+                    refreshTable();
+                }
 
-	private void refreshTable() {
-		tableViewer.setLabelProvider(new ViewLabelProvider());
-		locationColumn.setLabelProvider(new LocationTooltip());
-		coordinateColumn.setLabelProvider(new CoordinateTooltip());
-		tableViewer.refresh();
-	}
-	
-	@Override
-	public void createPartControl(Composite parent) {
-		this.parent = parent;
-		tableViewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
-				| SWT.V_SCROLL | SWT.FULL_SELECTION);
-		tableViewer.setLabelProvider(new ViewLabelProvider());
-		contentProvider = new ContentProvider();
-		tableViewer.setContentProvider(contentProvider);
-		tableViewer.setInput(getViewSite());
-		comparator = new TableComparator();
-		tableViewer.setComparator(comparator);
+            });
+        }
+    }
 
-		ColumnViewerToolTipSupport.enableFor(tableViewer, ToolTip.NO_RECREATE);
+    protected void setLabelProviderForTooltips() {
+        locationColumn.setLabelProvider(new LocationTooltip());
+    }
 
-		tableViewer.getTable().setHeaderVisible(true);
-		tableViewer.getTable().setLinesVisible(true);
+    private void refreshTable() {
+        tableViewer.setLabelProvider(new ViewLabelProvider());
+        locationColumn.setLabelProvider(new LocationTooltip());
+        coordinateColumn.setLabelProvider(new CoordinateTooltip());
+        tableViewer.refresh();
+    }
 
-		locationColumn = new TableViewerColumn(tableViewer, SWT.NONE);
-		TableColumn tableColumn = locationColumn.getColumn();
-		tableColumn.setText("Location");
-		tableColumn.setWidth(200);
-		tableColumn.addSelectionListener(new SelectionListener(tableColumn, 0));
+    @Override
+    public void createPartControl(final Composite parent) {
+        this.parent = parent;
+        tableViewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+        tableViewer.setLabelProvider(new ViewLabelProvider());
+        contentProvider = new ContentProvider();
+        tableViewer.setContentProvider(contentProvider);
+        tableViewer.setInput(getViewSite());
+        comparator = new TableComparator();
+        tableViewer.setComparator(comparator);
 
-		coordinateColumn = new TableViewerColumn(tableViewer, SWT.NONE);
-		tableColumn = coordinateColumn.getColumn();
-		tableColumn.setText("Coordinate");
-		tableColumn.setWidth(450);
-		tableColumn.addSelectionListener(new SelectionListener(tableColumn, 1));
+        ColumnViewerToolTipSupport.enableFor(tableViewer, ToolTip.NO_RECREATE);
 
-		tableViewer.getTable().setSortDirection(SWT.UP);
-		tableViewer.getTable().setSortColumn(locationColumn.getColumn());
-		
-		checkForDependencyUpdates();
-	}
+        tableViewer.getTable().setHeaderVisible(true);
+        tableViewer.getTable().setLinesVisible(true);
 
-	@Override
-	public void setFocus() {
-		tableViewer.getControl().setFocus();
-	}
+        locationColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+        TableColumn tableColumn = locationColumn.getColumn();
+        tableColumn.setText("Location");
+        tableColumn.setWidth(200);
+        tableColumn.addSelectionListener(new SelectionListener(tableColumn, 0));
 
-	class ViewLabelProvider extends LabelProvider implements
-			ITableLabelProvider {
-		public String getColumnText(Object obj, int index) {
-			if (obj instanceof DependencyInfo) {
-				DependencyInfo dependencyInfo = (DependencyInfo) obj;
-				switch (index) {
-				case COLUMN_LOCATION:
-					if (dependencyInfo.getType() == DependencyType.JRE){
-						Optional<String> executionEnvironment = dependencyInfo.getAttribute(DependencyInfo.EXECUTION_ENVIRONMENT);
-						if (executionEnvironment.isPresent()){
-							return executionEnvironment.get();
-						}
-					}
-					return dependencyInfo.getFile().getName();
-				case COLUMN_COORDINATE:
-					Optional<ProjectCoordinate> optionalProjectCoordinate = mappingProvider
-							.searchForProjectCoordinate(dependencyInfo);
-					if (optionalProjectCoordinate.isPresent()) {
-						return optionalProjectCoordinate.get().toString();
-					}
-				default:
-					return "";
-				}
-			}
-			return "";
-		}
+        coordinateColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+        tableColumn = coordinateColumn.getColumn();
+        tableColumn.setText("Coordinate");
+        tableColumn.setWidth(450);
+        tableColumn.addSelectionListener(new SelectionListener(tableColumn, 1));
 
-		public Image getColumnImage(Object obj, int index) {
-			if (obj instanceof DependencyInfo) {
-				DependencyInfo dependencyInfo = (DependencyInfo) obj;
-				switch (index) {
-				case COLUMN_LOCATION:
-					return getImageForDependencyTyp(dependencyInfo);
-				default:
-					return null;
-				}
-			}
-			return null;
-		}
+        tableViewer.getTable().setSortDirection(SWT.UP);
+        tableViewer.getTable().setSortColumn(locationColumn.getColumn());
 
-		private Image getImageForDependencyTyp(DependencyInfo dependencyInfo) {
-			switch (dependencyInfo.getType()) {
-			case JRE:
-				return loadImage("icons/cview16/classpath.gif");
-			case JAR:
-				return loadImage("icons/cview16/jar_obj.gif");
-			case PROJECT:
-				return loadImage("icons/cview16/projects.gif");
-			default:
-				return null;
-			}
-		}
+        checkForDependencyUpdates();
+    }
 
-		private Image loadImage(String name) {
-			ImageDescriptor imageDescriptor = Activator
-					.getImageDescriptor(name);
-			if (imageDescriptor != null) {
-				Image image = imageDescriptor.createImage();
-				return image;
-			}
-			return null;
-		}
-	}
+    @Override
+    public void setFocus() {
+        tableViewer.getControl().setFocus();
+    }
 
-	class ContentProvider implements IStructuredContentProvider {
+    class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
+        @Override
+        public String getColumnText(final Object obj, final int index) {
+            if (obj instanceof DependencyInfo) {
+                DependencyInfo dependencyInfo = (DependencyInfo) obj;
+                switch (index) {
+                case COLUMN_LOCATION:
+                    if (dependencyInfo.getType() == DependencyType.JRE) {
+                        Optional<String> executionEnvironment = dependencyInfo
+                                .getAttribute(DependencyInfo.EXECUTION_ENVIRONMENT);
+                        if (executionEnvironment.isPresent()) {
+                            return executionEnvironment.get();
+                        }
+                    }
+                    return dependencyInfo.getFile().getName();
+                case COLUMN_COORDINATE:
+                    Optional<ProjectCoordinate> optionalProjectCoordinate = mappingProvider
+                            .searchForProjectCoordinate(dependencyInfo);
+                    if (optionalProjectCoordinate.isPresent()) {
+                        return optionalProjectCoordinate.get().toString();
+                    }
+                default:
+                    return "";
+                }
+            }
+            return "";
+        }
 
-		private List<DependencyInfo> data = new ArrayList<DependencyInfo>();
+        @Override
+        public Image getColumnImage(final Object obj, final int index) {
+            if (obj instanceof DependencyInfo) {
+                DependencyInfo dependencyInfo = (DependencyInfo) obj;
+                switch (index) {
+                case COLUMN_LOCATION:
+                    return getImageForDependencyTyp(dependencyInfo);
+                default:
+                    return null;
+                }
+            }
+            return null;
+        }
 
-		public void setData(Set<DependencyInfo> dependencyInfos) {
-			data.clear();
-			data.addAll(dependencyInfos);
-		}
+        private Image getImageForDependencyTyp(final DependencyInfo dependencyInfo) {
+            switch (dependencyInfo.getType()) {
+            case JRE:
+                return loadImage("icons/cview16/classpath.gif");
+            case JAR:
+                return loadImage("icons/cview16/jar_obj.gif");
+            case PROJECT:
+                return loadImage("icons/cview16/projects.gif");
+            default:
+                return null;
+            }
+        }
 
-		@Override
-		public void dispose() {
-			// unused in this case
-		}
+        private Image loadImage(final String name) {
+            ImageDescriptor imageDescriptor = Activator.getImageDescriptor(name);
+            if (imageDescriptor != null) {
+                Image image = imageDescriptor.createImage();
+                return image;
+            }
+            return null;
+        }
+    }
 
-		@Override
-		public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-			// unused in this case
-		}
+    class ContentProvider implements IStructuredContentProvider {
 
-		@Override
-		public Object[] getElements(Object inputElement) {
-			return data.toArray();
-		}
+        private List<DependencyInfo> data = new ArrayList<DependencyInfo>();
 
-	}
+        public void setData(final Set<DependencyInfo> dependencyInfos) {
+            data.clear();
+            data.addAll(dependencyInfos);
+        }
 
-	abstract class ToolTipProvider extends CellLabelProvider {
-		@Override
-		public void update(ViewerCell cell) {
-			cell.setText(cell.getText());
-		}
+        @Override
+        public void dispose() {
+            // unused in this case
+        }
 
-		@Override
-		public String getToolTipText(Object element) {
-			if (element instanceof DependencyInfo) {
-				DependencyInfo dependencyInfo = (DependencyInfo) element;
-				return generateTooltip(dependencyInfo);
-			}
-			return "";
-		}
+        @Override
+        public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+            // unused in this case
+        }
 
-		protected abstract String generateTooltip(DependencyInfo dependencyInfo);
+        @Override
+        public Object[] getElements(final Object inputElement) {
+            return data.toArray();
+        }
 
-		@Override
-		public Point getToolTipShift(Object object) {
-			return new Point(5, 5);
-		}
+    }
 
-		@Override
-		public int getToolTipDisplayDelayTime(Object object) {
-			return 100;
-		}
+    abstract class ToolTipProvider extends CellLabelProvider {
+        @Override
+        public void update(final ViewerCell cell) {
+            cell.setText(cell.getText());
+        }
 
-		@Override
-		public int getToolTipTimeDisplayed(Object object) {
-			return 10000;
-		}
+        @Override
+        public String getToolTipText(final Object element) {
+            if (element instanceof DependencyInfo) {
+                DependencyInfo dependencyInfo = (DependencyInfo) element;
+                return generateTooltip(dependencyInfo);
+            }
+            return "";
+        }
 
-	}
+        protected abstract String generateTooltip(DependencyInfo dependencyInfo);
 
-	class LocationTooltip extends ToolTipProvider {
+        @Override
+        public Point getToolTipShift(final Object object) {
+            return new Point(5, 5);
+        }
 
-		@Override
-		protected String generateTooltip(DependencyInfo dependencyInfo) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("Location: ");
-			if (dependencyInfo.getType() == DependencyType.PROJECT){
-				sb.append(dependencyInfo.getFile().getPath());				
-			}else{
-				sb.append(dependencyInfo.getFile().getAbsolutePath());
-			}
-			sb.append(System.getProperty("line.separator"));
+        @Override
+        public int getToolTipDisplayDelayTime(final Object object) {
+            return 100;
+        }
 
-			sb.append("Type: ");
-			sb.append(dependencyInfo.getType().toString());
+        @Override
+        public int getToolTipTimeDisplayed(final Object object) {
+            return 10000;
+        }
 
-			Map<String, String> attributeMap = dependencyInfo.getAttributeMap();
-			if ((attributeMap != null) && (!attributeMap.isEmpty())) {
-				sb.append(System.getProperty("line.separator"));
-				sb.append("Attributes: ");
-				for (Entry<String, String> entry : attributeMap.entrySet()) {
-					sb.append(System.getProperty("line.separator"));
-					sb.append("  ");
-					sb.append(entry.getKey());
-					sb.append(": ");
-					sb.append(entry.getValue());
-				}
-			}
+    }
 
-			return sb.toString();
-		}
+    class LocationTooltip extends ToolTipProvider {
 
-	}
+        @Override
+        protected String generateTooltip(final DependencyInfo dependencyInfo) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Location: ");
+            if (dependencyInfo.getType() == DependencyType.PROJECT) {
+                sb.append(dependencyInfo.getFile().getPath());
+            } else {
+                sb.append(dependencyInfo.getFile().getAbsolutePath());
+            }
+            sb.append(System.getProperty("line.separator"));
 
-	class CoordinateTooltip extends ToolTipProvider {
+            sb.append("Type: ");
+            sb.append(dependencyInfo.getType().toString());
 
-		@Override
-		protected String generateTooltip(DependencyInfo dependencyInfo) {
-			StringBuilder sb = new StringBuilder();
-			List<IMappingStrategy> strategies = mappingProvider.getStrategies();
+            Map<String, String> attributeMap = dependencyInfo.getAttributeMap();
+            if (attributeMap != null && !attributeMap.isEmpty()) {
+                sb.append(System.getProperty("line.separator"));
+                sb.append("Attributes: ");
+                for (Entry<String, String> entry : attributeMap.entrySet()) {
+                    sb.append(System.getProperty("line.separator"));
+                    sb.append("  ");
+                    sb.append(entry.getKey());
+                    sb.append(": ");
+                    sb.append(entry.getValue());
+                }
+            }
 
-			for (IMappingStrategy strategy : strategies) {
-				if (strategies.indexOf(strategy) != 0) {
-					sb.append(System.getProperty("line.separator"));
-				}
-				sb.append(strategy.getClass().getSimpleName());
-				sb.append(": ");
-				if (!strategy.isApplicable(dependencyInfo.getType())){
-					sb.append("n/a");
-				}else{
-					Optional<ProjectCoordinate> optionalCoordinate = strategy
-							.searchForProjectCoordinate(dependencyInfo);
-					if (optionalCoordinate.isPresent()) {
-						sb.append(optionalCoordinate.get().toString());
-					}else{
-						sb.append("unknown");
-					}
-				}
-				
-			}
-			return sb.toString();
-		}
+            return sb.toString();
+        }
 
-	}
+    }
 
-	public class TableComparator extends ViewerComparator {
-		private int column = 0;
-		private int direction = SWT.UP;
+    class CoordinateTooltip extends ToolTipProvider {
 
-		public int getDirection() {
-			return direction;
-		}
+        @Override
+        protected String generateTooltip(final DependencyInfo dependencyInfo) {
+            StringBuilder sb = new StringBuilder();
+            List<IProjectCoordinateResolver> strategies = mappingProvider.getStrategies();
 
-		public void setColumn(int column) {
-			if (column == this.column) {
-				switch (direction) {
-				case SWT.NONE:
-					direction = SWT.UP;
-					break;
-				case SWT.UP:
-					direction = SWT.DOWN;
-					break;
-				default:
-					direction = SWT.NONE;
-					break;
-				}
-			} else {
-				this.column = column;
-				direction = SWT.UP;
-			}
-		}
+            for (IProjectCoordinateResolver strategy : strategies) {
+                if (strategies.indexOf(strategy) != 0) {
+                    sb.append(System.getProperty("line.separator"));
+                }
+                sb.append(strategy.getClass().getSimpleName());
+                sb.append(": ");
+                if (!strategy.isApplicable(dependencyInfo.getType())) {
+                    sb.append("n/a");
+                } else {
+                    Optional<ProjectCoordinate> optionalCoordinate = strategy
+                            .searchForProjectCoordinate(dependencyInfo);
+                    if (optionalCoordinate.isPresent()) {
+                        sb.append(optionalCoordinate.get().toString());
+                    } else {
+                        sb.append("unknown");
+                    }
+                }
 
-		@Override
-		public int compare(Viewer viewer, Object e1, Object e2) {
-			int result = 0;
-			if (direction == SWT.NONE){
-				return 0;
-			}
-			if ((e1 instanceof DependencyInfo)
-					&& (e2 instanceof DependencyInfo)) {
-				DependencyInfo firstElement = (DependencyInfo) e1;
-				DependencyInfo secondElement = (DependencyInfo) e2;
+            }
+            return sb.toString();
+        }
 
-				switch (column) {
-				case COLUMN_LOCATION:
-					result = compareLocation(firstElement, secondElement);
-					break;
-				case COLUMN_COORDINATE:
-					result = compareCoordinate(firstElement, secondElement);
-					break;
-				default:
-					result = 0;
-					break;
-				}
-			}
-			if (direction == SWT.DOWN) {
-				return -result;
-			}
-			return result;
-		}
+    }
 
-		private int compareCoordinate(DependencyInfo firstElement,
-				DependencyInfo secondElement) {
-			Optional<ProjectCoordinate> optionalCoordinateFirstElement = mappingProvider.searchForProjectCoordinate(firstElement);
-			Optional<ProjectCoordinate> optionalCoordinateSecondElement = mappingProvider.searchForProjectCoordinate(secondElement);
-			
-			if (optionalCoordinateFirstElement.isPresent()){
-				if (optionalCoordinateSecondElement.isPresent()){
-					return optionalCoordinateFirstElement.get().toString().compareTo(optionalCoordinateSecondElement.get().toString());
-				}else{
-					return -1;
-				}
-			}else{
-				if (optionalCoordinateSecondElement.isPresent()){
-					return 1;					
-				}else{
-					return 0;
-				}
-			}
-		}
+    public class TableComparator extends ViewerComparator {
+        private int column = 0;
+        private int direction = SWT.UP;
 
-		private int compareLocation(DependencyInfo firstElement,
-				DependencyInfo secondElement) {
-			int compareScore = -firstElement.getType().compareTo(secondElement.getType());
-			if (compareScore == 0){
-				return firstElement.getFile().getName().compareToIgnoreCase(secondElement.getFile().getName());
-			}
-			return compareScore;
-		}
+        public int getDirection() {
+            return direction;
+        }
 
-	}
+        public void setColumn(final int column) {
+            if (column == this.column) {
+                switch (direction) {
+                case SWT.NONE:
+                    direction = SWT.UP;
+                    break;
+                case SWT.UP:
+                    direction = SWT.DOWN;
+                    break;
+                default:
+                    direction = SWT.NONE;
+                    break;
+                }
+            } else {
+                this.column = column;
+                direction = SWT.UP;
+            }
+        }
 
-	class SelectionListener extends SelectionAdapter {
+        @Override
+        public int compare(final Viewer viewer, final Object e1, final Object e2) {
+            int result = 0;
+            if (direction == SWT.NONE) {
+                return 0;
+            }
+            if (e1 instanceof DependencyInfo && e2 instanceof DependencyInfo) {
+                DependencyInfo firstElement = (DependencyInfo) e1;
+                DependencyInfo secondElement = (DependencyInfo) e2;
 
-		private TableColumn tableColumn;
-		private int index;
+                switch (column) {
+                case COLUMN_LOCATION:
+                    result = compareLocation(firstElement, secondElement);
+                    break;
+                case COLUMN_COORDINATE:
+                    result = compareCoordinate(firstElement, secondElement);
+                    break;
+                default:
+                    result = 0;
+                    break;
+                }
+            }
+            if (direction == SWT.DOWN) {
+                return -result;
+            }
+            return result;
+        }
 
-		public SelectionListener(final TableColumn tableColumn, int index) {
-			this.tableColumn = tableColumn;
-			this.index = index;
-		}
+        private int compareCoordinate(final DependencyInfo firstElement, final DependencyInfo secondElement) {
+            Optional<ProjectCoordinate> optionalCoordinateFirstElement = mappingProvider
+                    .searchForProjectCoordinate(firstElement);
+            Optional<ProjectCoordinate> optionalCoordinateSecondElement = mappingProvider
+                    .searchForProjectCoordinate(secondElement);
 
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			comparator.setColumn(index);
-			int direction = comparator.getDirection();
-			tableViewer.getTable().setSortDirection(direction);
-			tableViewer.getTable().setSortColumn(tableColumn);
-			refreshTable();
-		}
-	};
+            if (optionalCoordinateFirstElement.isPresent()) {
+                if (optionalCoordinateSecondElement.isPresent()) {
+                    return optionalCoordinateFirstElement.get().toString()
+                            .compareTo(optionalCoordinateSecondElement.get().toString());
+                } else {
+                    return -1;
+                }
+            } else {
+                if (optionalCoordinateSecondElement.isPresent()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        }
+
+        private int compareLocation(final DependencyInfo firstElement, final DependencyInfo secondElement) {
+            int compareScore = -firstElement.getType().compareTo(secondElement.getType());
+            if (compareScore == 0) {
+                return firstElement.getFile().getName().compareToIgnoreCase(secondElement.getFile().getName());
+            }
+            return compareScore;
+        }
+
+    }
+
+    class SelectionListener extends SelectionAdapter {
+
+        private TableColumn tableColumn;
+        private int index;
+
+        public SelectionListener(final TableColumn tableColumn, final int index) {
+            this.tableColumn = tableColumn;
+            this.index = index;
+        }
+
+        @Override
+        public void widgetSelected(final SelectionEvent e) {
+            comparator.setColumn(index);
+            int direction = comparator.getDirection();
+            tableViewer.getTable().setSortDirection(direction);
+            tableViewer.getTable().setSortColumn(tableColumn);
+            refreshTable();
+        }
+    };
 
 }

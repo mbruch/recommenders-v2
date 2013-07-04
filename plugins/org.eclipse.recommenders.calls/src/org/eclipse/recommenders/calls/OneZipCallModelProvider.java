@@ -80,7 +80,7 @@ public class OneZipCallModelProvider implements ICallModelProvider, Openable {
             String path = Zips.path(type, ".data");
             ZipEntry entry = zip.getEntry(path);
             if (entry == null) {
-                return NullCallModel.NULL;
+                return NullCallModel.NULL_MODEL;
             }
             InputStream is = null;
             try {
@@ -89,7 +89,7 @@ public class OneZipCallModelProvider implements ICallModelProvider, Openable {
                 return new JayesCallModel(type, bayesNet);
             } catch (Exception e) {
                 e.printStackTrace();
-                return NullCallModel.NULL;
+                return NullCallModel.NULL_MODEL;
             } finally {
                 closeQuietly(is);
             }

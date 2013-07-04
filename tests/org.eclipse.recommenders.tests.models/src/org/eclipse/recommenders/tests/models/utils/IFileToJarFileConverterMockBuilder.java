@@ -23,20 +23,20 @@ import java.util.Properties;
 import java.util.jar.JarFile;
 
 import org.eclipse.recommenders.models.dependencies.impl.MavenPomPropertiesStrategy.IFileToJarFileConverter;
-import org.eclipse.recommenders.utils.Tuple;
+import org.eclipse.recommenders.utils.Pair;
 
 import com.google.common.base.Optional;
 
 public class IFileToJarFileConverterMockBuilder {
 
-    private final List<Tuple<String, Properties>> entries = new LinkedList<Tuple<String, Properties>>();
+    private final List<Pair<String, Properties>> entries = new LinkedList<Pair<String, Properties>>();
 
-    public IFileToJarFileConverterMockBuilder put(String pomPropertiesFileName, Properties properties) {
-        entries.add(Tuple.newTuple(pomPropertiesFileName, properties));
+    public IFileToJarFileConverterMockBuilder put(final String pomPropertiesFileName, final Properties properties) {
+        entries.add(Pair.newPair(pomPropertiesFileName, properties));
         return this;
     }
 
-    private ByteArrayInputStream createInputStream(Properties properties) {
+    private ByteArrayInputStream createInputStream(final Properties properties) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             properties.store(outputStream, "");
@@ -50,10 +50,10 @@ public class IFileToJarFileConverterMockBuilder {
         return new IFileToJarFileConverter() {
 
             @Override
-            public Optional<JarFile> createJarFile(File file) {
+            public Optional<JarFile> createJarFile(final File file) {
                 final JarFileMockBuilder builder = new JarFileMockBuilder();
 
-                for (Tuple<String, Properties> entry : entries) {
+                for (Pair<String, Properties> entry : entries) {
                     builder.addEntry(entry.getFirst(), createInputStream(entry.getSecond()));
                 }
                 return fromNullable(builder.build());
@@ -62,6 +62,6 @@ public class IFileToJarFileConverterMockBuilder {
     }
 
     public static IFileToJarFileConverter createEmptyIFileToJarFileConverter() {
-        return (new IFileToJarFileConverterMockBuilder()).build();
+        return new IFileToJarFileConverterMockBuilder().build();
     }
 }

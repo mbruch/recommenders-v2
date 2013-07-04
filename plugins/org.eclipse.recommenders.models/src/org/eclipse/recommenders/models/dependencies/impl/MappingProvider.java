@@ -22,7 +22,7 @@ import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
 import org.eclipse.recommenders.models.dependencies.IMappingProvider;
-import org.eclipse.recommenders.models.dependencies.IMappingStrategy;
+import org.eclipse.recommenders.models.dependencies.IProjectCoordinateResolver;
 import org.eclipse.recommenders.utils.annotations.Testing;
 
 import com.google.common.base.Optional;
@@ -35,7 +35,7 @@ import com.google.common.collect.Maps;
 
 public class MappingProvider implements IMappingProvider {
 
-	private List<IMappingStrategy> strategies = Lists.newArrayList();
+	private List<IProjectCoordinateResolver> strategies = Lists.newArrayList();
 	private Cache<DependencyInfo, Optional<ProjectCoordinate>> cache;
 	private Map<DependencyInfo, ProjectCoordinate> manualMappings = Maps
 			.newHashMap();
@@ -51,17 +51,17 @@ public class MappingProvider implements IMappingProvider {
 	}
 
 	@Override
-	public List<IMappingStrategy> getStrategies() {
+	public List<IProjectCoordinateResolver> getStrategies() {
 		return ImmutableList.copyOf(strategies);
 	}
 
 	@Override
-	public void addStrategy(IMappingStrategy strategy) {
+	public void addStrategy(IProjectCoordinateResolver strategy) {
 		strategies.add(strategy);
 	}
 
 	@Override
-	public void setStrategies(List<IMappingStrategy> strategies) {
+	public void setStrategies(List<IProjectCoordinateResolver> strategies) {
 		this.strategies = strategies;
 	}
 
@@ -85,7 +85,7 @@ public class MappingProvider implements IMappingProvider {
 
 	private Optional<ProjectCoordinate> extractProjectCoordinate(
 			DependencyInfo dependencyInfo) {
-		for (IMappingStrategy strategy : strategies) {
+		for (IProjectCoordinateResolver strategy : strategies) {
 			Optional<ProjectCoordinate> optionalProjectCoordinate = strategy
 					.searchForProjectCoordinate(dependencyInfo);
 			if (optionalProjectCoordinate.isPresent()) {
@@ -97,7 +97,7 @@ public class MappingProvider implements IMappingProvider {
 
 	@Override
 	public boolean isApplicable(DependencyType dependencyTyp) {
-		for (IMappingStrategy mappingStrategy : strategies) {
+		for (IProjectCoordinateResolver mappingStrategy : strategies) {
 			if (mappingStrategy.isApplicable(dependencyTyp)) {
 				return true;
 			}

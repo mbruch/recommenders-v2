@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.recommenders.examples.models.UsingModelArchiveCache;
+
 import com.google.common.base.Optional;
 
 /**
@@ -27,16 +27,13 @@ public abstract class ModelRepository {
     /**
      * The coordinate under which the model search index of the remote model repository is addressable.
      */
-    public static ModelArchiveCoordinate INDEX = new ModelArchiveCoordinate("org.eclipse.recommenders",
-            "index",
-            "index",
-            "zip",
-            "0.0.0-SNAPSHOT");
+    public static ModelArchiveCoordinate INDEX = new ModelArchiveCoordinate("org.eclipse.recommenders", "index",
+            "index", "zip", "0.0.0-SNAPSHOT");
 
     /**
      * Utility method that checks whether the given coordinate is the index coordinate.
      */
-    public static boolean isModelIndex(ModelArchiveCoordinate coord) {
+    public static boolean isModelIndex(final ModelArchiveCoordinate coord) {
         return INDEX.equals(coord);
     }
 
@@ -104,7 +101,7 @@ public abstract class ModelRepository {
 
             public final ModelRepository cache;
 
-            public ModelArchiveCacheEvent(ModelRepository cache) {
+            public ModelArchiveCacheEvent(final ModelRepository cache) {
                 this.cache = cache;
             }
         }
@@ -115,7 +112,7 @@ public abstract class ModelRepository {
          */
         public static class RemoteRepositoryChangedEvent extends ModelArchiveCacheEvent {
 
-            public RemoteRepositoryChangedEvent(ModelRepository cache) {
+            public RemoteRepositoryChangedEvent(final ModelRepository cache) {
                 super(cache);
             }
         }
@@ -126,7 +123,7 @@ public abstract class ModelRepository {
          */
         public static class ModelArchiveCacheOpenedEvent extends ModelArchiveCacheEvent {
 
-            public ModelArchiveCacheOpenedEvent(ModelRepository cache) {
+            public ModelArchiveCacheOpenedEvent(final ModelRepository cache) {
                 super(cache);
             }
         }
@@ -137,7 +134,7 @@ public abstract class ModelRepository {
          */
         public static class ModelArchiveCacheClosedEvent extends ModelArchiveCacheEvent {
 
-            public ModelArchiveCacheClosedEvent(ModelRepository cache) {
+            public ModelArchiveCacheClosedEvent(final ModelRepository cache) {
                 super(cache);
             }
         }
@@ -151,9 +148,9 @@ public abstract class ModelRepository {
 
             public ModelArchiveCoordinate coordinate;
 
-            public ModelArchiveInstalledEvent(ModelRepository cache, ModelArchiveCoordinate model) {
+            public ModelArchiveInstalledEvent(final ModelRepository cache, final ModelArchiveCoordinate model) {
                 super(cache);
-                this.coordinate = model;
+                coordinate = model;
             }
         }
     }

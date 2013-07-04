@@ -10,8 +10,7 @@
  */
 package org.eclipse.recommenders.tests.models;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,7 +20,7 @@ import java.io.IOException;
 import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
-import org.eclipse.recommenders.models.dependencies.IMappingStrategy;
+import org.eclipse.recommenders.models.dependencies.IProjectCoordinateResolver;
 import org.eclipse.recommenders.models.dependencies.impl.JREReleaseFileStrategy;
 import org.junit.Rule;
 import org.junit.Test;
@@ -64,7 +63,7 @@ public class JREReleaseFileStrategyTest {
     @Test
     public void testInvalidType() {
         DependencyInfo info = new DependencyInfo(new File(""), DependencyType.JAR);
-        IMappingStrategy sut = new JREReleaseFileStrategy();
+        IProjectCoordinateResolver sut = new JREReleaseFileStrategy();
 
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
@@ -79,7 +78,7 @@ public class JREReleaseFileStrategyTest {
         fillReleaseFileWithOtherStuff();
 
         DependencyInfo info = new DependencyInfo(javaHomeDirectory, DependencyType.JRE);
-        IMappingStrategy sut = new JREReleaseFileStrategy();
+        IProjectCoordinateResolver sut = new JREReleaseFileStrategy();
 
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
@@ -93,7 +92,7 @@ public class JREReleaseFileStrategyTest {
         fillReleaseFileWithOtherStuff();
 
         DependencyInfo info = new DependencyInfo(javaHomeDirectory, DependencyType.JRE);
-        IMappingStrategy sut = new JREReleaseFileStrategy();
+        IProjectCoordinateResolver sut = new JREReleaseFileStrategy();
 
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
@@ -105,7 +104,7 @@ public class JREReleaseFileStrategyTest {
         createJavaHomeDirectory();
 
         DependencyInfo info = new DependencyInfo(javaHomeDirectory, DependencyType.JRE);
-        IMappingStrategy sut = new JREReleaseFileStrategy();
+        IProjectCoordinateResolver sut = new JREReleaseFileStrategy();
 
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.recommenders.utils.Recommendation;
-import org.eclipse.recommenders.utils.RecommendationsProcessor;
 import org.eclipse.recommenders.utils.names.IMethodName;
 import org.eclipse.recommenders.utils.names.ITypeName;
 
@@ -23,8 +22,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 /**
- * Thin layer around a Bayesian network designed for recommending method calls, definitions, and unordered object usage
- * patterns (list of calls).
+ * A thin layer around a Bayesian network designed for recommending method calls, definitions, and unordered object
+ * usage patterns (list of calls).
  * <p>
  * Note that {@link ICallModel}s are stateful and thus should not be shared between - and used by - several recommenders
  * at the same time.
@@ -35,7 +34,7 @@ public interface ICallModel {
     /**
      * Returns the type this net makes recommendations for.
      */
-    ITypeName getType();
+    ITypeName getReceiverType();
 
     /**
      * Clears all observations and puts the network in its initial state.
@@ -43,22 +42,12 @@ public interface ICallModel {
     void reset();
 
     /**
-     * Adds a new observed call to the list of already observed calls. If the given method does not exist in this net it
-     * is ignored.
-     * 
-     * @return returns <code>true</code> when a matching method node was found and put into observed state
-     */
-    boolean setObservedCall(final IMethodName additionalCalledMethod);
-
-    /**
-     * Sets the observed state for the given called methods. Note that information about previously called methods is
-     * kept.
+     * Sets the observed state for the given methods. Any previous observations about method calls are lost.
      * 
      * @return returns <code>true</code> when for <b>all</b> given methods a matching method node was found and put into
      *         observed state
-     * @see #setObservedCall(IMethodName)
      */
-    boolean setObservedCalls(final Set<IMethodName> additionalCalledMethods);
+    boolean setObservedCalls(Set<IMethodName> observedCalls);
 
     /**
      * Sets the overridden method context. This is used to refine recommendations based on where, i.e., in the context
@@ -67,7 +56,7 @@ public interface ICallModel {
      * 
      * @return returns <code>true</code> when the given overridden method context is known
      */
-    boolean setObservedOverrideContext(final IMethodName newOverriddenMethod);
+    boolean setObservedOverrideContext(IMethodName overriddenMethod);
 
     /**
      * Sets the information how the variable was initially defined.
@@ -81,20 +70,19 @@ public interface ICallModel {
      * 
      * @return returns <code>true</code> if the defining method was found, <code>false</code> otherwise
      */
-    boolean setObservedDefiningMethod(final IMethodName newDefinedBy);
+    boolean setObservedDefiningMethod(IMethodName definedBy);
 
     /**
      * @see #setObservedDefiningMethod(IMethodName)
      */
-    // TODO should setObservedDefinitionType and setObservedDefiningMethod be merged into a single method?
-    boolean setObservedDefinitionType(final DefinitionType newDefType);
+    boolean setObservedDefinitionType(DefinitionType defType);
 
     /**
      * Sets the given pattern as observed. This call is ignored when the given name is not known.
      * 
      * @return returns <code>true</code> if the pattern was found, <code>false</code> otherwise
      */
-    boolean setObservedPattern(final String newPatternName);
+    boolean setObservedPattern(String patternName);
 
     /**
      * Returns the currently observed overridden method - if any. If this value is present, it usually points to the
@@ -139,19 +127,31 @@ public interface ICallModel {
     ImmutableSet<String> getKnownPatterns();
 
     /**
-     * Returns a sorted set of recommended variable definitions.
+     * Returns a list of recommended variable definitions.
+     * <p>
+     * No guarantees are made with respect to the order of the returned list. In particular, the recommendations are not
+     * sorted by relevance. If such post-precessing of the recommendations is desired, consider using a
+     * {@link RecommendationsProcessor}.
      */
-    List<Recommendation<IMethodName>> getRecommendedDefinitions(RecommendationsProcessor<IMethodName> processor);
+    List<Recommendation<IMethodName>> getRecommendedDefinitions();
 
     /**
-     * Returns a sorted set of recommended usage patterns.
+     * Returns a list of recommended usage patterns.
+     * <p>
+     * No guarantees are made with respect to the order of the returned list. In particular, the recommendations are not
+     * sorted by relevance. If such post-precessing of the recommendations is desired, consider using a
+     * {@link RecommendationsProcessor}.
      */
-    List<Recommendation<String>> getRecommendedPatterns(RecommendationsProcessor<String> processor);
+    List<Recommendation<String>> getRecommendedPatterns();
 
     /**
-     * Returns a sorted set of recommended method calls.
+     * Returns a list of recommended method calls.
+     * <p>
+     * No guarantees are made with respect to the order of the returned list. In particular, the recommendations are not
+     * sorted by relevance. If such post-precessing of the recommendations is desired, consider using a
+     * {@link RecommendationsProcessor}.
      */
-    List<Recommendation<IMethodName>> getRecommendedCalls(RecommendationsProcessor<IMethodName> processor);
+    List<Recommendation<IMethodName>> getRecommendedCalls();
 
     /**
      * Specifies how the variable under examination was defined (field, parameter, by method return...).

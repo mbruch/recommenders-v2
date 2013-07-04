@@ -2,12 +2,12 @@ package org.eclipse.recommenders.examples.models;
 
 import java.io.IOException;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.recommenders.models.ModelArchiveCoordinate;
 import org.eclipse.recommenders.models.ModelRepository;
 import org.eclipse.recommenders.models.ModelRepository.ModelRepositoryEvents;
 import org.eclipse.recommenders.models.ProjectCoordinate;
+import org.eclipse.recommenders.utils.Pair;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -16,26 +16,27 @@ import com.google.common.eventbus.Subscribe;
 @SuppressWarnings("unused")
 public class UsingModelArchiveCache {
 
-    void downloadModelArchive(ModelArchiveCoordinate model, ModelRepository repository) throws IOException {
+    void downloadModelArchive(final ModelArchiveCoordinate model, final ModelRepository repository) throws IOException {
         repository.resolve(model, newMonitor());
     }
 
-    void findLocalModelArchive(ModelArchiveCoordinate model, ModelRepository repository) throws IOException {
+    void findLocalModelArchive(final ModelArchiveCoordinate model, final ModelRepository repository) throws IOException {
         if (!repository.getLocation(model).isPresent()) {
             repository.resolve(model, newMonitor());
         }
     }
 
-    void deleteCachedModelArchive(ModelArchiveCoordinate model, ModelRepository repository) throws IOException {
+    void deleteCachedModelArchive(final ModelArchiveCoordinate model, final ModelRepository repository)
+            throws IOException {
         repository.delete(model, newMonitor());
     }
 
-    void deleteIndex(ModelRepository repository) throws IOException {
+    void deleteIndex(final ModelRepository repository) throws IOException {
         repository.delete(ModelRepository.INDEX, newMonitor());
     }
 
-    void findAllModelArtifacts(ProjectCoordinate[] gavs, ModelRepository cache,
-            IModelArchiveCoordinateProvider[] modelProviders) {
+    void findAllModelArtifacts(final ProjectCoordinate[] gavs, final ModelRepository cache,
+            final IModelArchiveCoordinateProvider[] modelProviders) {
 
         Table<ProjectCoordinate, String, Pair<ModelArchiveCoordinate, Boolean>> mappings = HashBasedTable.create();
         for (ProjectCoordinate projectCoord : gavs) {
@@ -43,7 +44,7 @@ public class UsingModelArchiveCache {
                 ModelArchiveCoordinate modelCoord = modelProvider.find(projectCoord).orNull();
                 if (modelCoord != null) {
                     boolean cached = cache.isCached(modelCoord);
-                    mappings.put(projectCoord, modelProvider.getType(), Pair.of(modelCoord, cached));
+                    mappings.put(projectCoord, modelProvider.getType(), Pair.newPair(modelCoord, cached));
                 }
             }
         }
@@ -51,18 +52,18 @@ public class UsingModelArchiveCache {
     }
 
     @Subscribe
-    void onEvent(ModelRepositoryEvents.ModelArchiveCacheOpenedEvent e) {
+    void onEvent(final ModelRepositoryEvents.ModelArchiveCacheOpenedEvent e) {
         // TODO check if a new index is available and download it
 
     }
 
     @Subscribe
-    void onEvent(ModelRepositoryEvents.ModelArchiveCacheClosedEvent e) {
+    void onEvent(final ModelRepositoryEvents.ModelArchiveCacheClosedEvent e) {
         // TODO persists what needs to be persisted
     }
 
     @Subscribe
-    void onEvent(ModelRepositoryEvents.ModelArchiveInstalledEvent e) {
+    void onEvent(final ModelRepositoryEvents.ModelArchiveInstalledEvent e) {
         // TODO delete old cached keys, and reload the models currently required
     }
 

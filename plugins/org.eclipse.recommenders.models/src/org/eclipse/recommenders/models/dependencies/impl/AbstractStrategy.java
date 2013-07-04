@@ -14,11 +14,11 @@ import static com.google.common.base.Optional.absent;
 
 import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
-import org.eclipse.recommenders.models.dependencies.IMappingStrategy;
+import org.eclipse.recommenders.models.dependencies.IProjectCoordinateResolver;
 
 import com.google.common.base.Optional;
 
-public abstract class AbstractStrategy implements IMappingStrategy {
+public abstract class AbstractStrategy implements IProjectCoordinateResolver {
 
     @Override
     public Optional<ProjectCoordinate> searchForProjectCoordinate(DependencyInfo dependencyInfo) {

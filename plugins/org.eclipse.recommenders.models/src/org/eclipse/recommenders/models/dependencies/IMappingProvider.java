@@ -18,13 +18,13 @@ import org.eclipse.recommenders.models.ProjectCoordinate;
 /**
  * The Mapping interface provide the functionality for the mapping between IDependencyInfo and ProjectCoordinate
  */
-public interface IMappingProvider extends IMappingStrategy {
+public interface IMappingProvider extends IProjectCoordinateResolver {
 
-    List<IMappingStrategy> getStrategies();
+    List<IProjectCoordinateResolver> getStrategies();
 
-    void addStrategy(IMappingStrategy strategy);
+    void addStrategy(IProjectCoordinateResolver strategy);
 
-    void setStrategies(List<IMappingStrategy> strategies);
+    void setStrategies(List<IProjectCoordinateResolver> strategies);
 
     void setManualMapping(DependencyInfo dependencyInfo, ProjectCoordinate projectCoordinate);
     

@@ -7,10 +7,10 @@
  *  <li> {@link org.eclipse.recommenders.calls.ICallModelProvider}
  *  </ul>
  * 
- * Then continue reading their implementating classes and, if available, and their example usages located in the 
+ * Then continue reading their implementing classes and, if available, and their example usages located in the
  * {@link org.eclipse.recommenders.examples.calls} package.
  * <p>
- * Note that there is no interface <i>ICallRecommender</i> or anything alike. The primary interface to making 
+ * Note that there is no interface <i>ICallRecommender</i> or anything alike. The primary interface to making
  * recommendations is {@link org.eclipse.recommenders.calls.ICallModel}.
  */
 package org.eclipse.recommenders.calls;

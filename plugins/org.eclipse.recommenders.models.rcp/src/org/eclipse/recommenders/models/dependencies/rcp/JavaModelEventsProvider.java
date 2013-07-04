@@ -11,8 +11,7 @@
  */
 package org.eclipse.recommenders.models.dependencies.rcp;
 
-import static org.eclipse.jdt.core.IJavaElementDelta.F_ADDED_TO_CLASSPATH;
-import static org.eclipse.jdt.core.IJavaElementDelta.F_REMOVED_FROM_CLASSPATH;
+import static org.eclipse.jdt.core.IJavaElementDelta.*;
 import static org.eclipse.recommenders.utils.Checks.cast;
 
 import java.util.Set;
@@ -33,14 +32,14 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.core.JarPackageFragmentRoot;
 import org.eclipse.jdt.internal.core.JavaProject;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.CompilationUnitAdded;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.CompilationUnitChanged;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.CompilationUnitRemoved;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.CompilationUnitSaved;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JarPackageFragmentRootAdded;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JarPackageFragmentRootRemoved;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectClosed;
-import org.eclipse.recommenders.utils.rcp.events.JavaModelEvents.JavaProjectOpened;
+import org.eclipse.recommenders.rcp.events.JavaModelEvents.CompilationUnitAdded;
+import org.eclipse.recommenders.rcp.events.JavaModelEvents.CompilationUnitChanged;
+import org.eclipse.recommenders.rcp.events.JavaModelEvents.CompilationUnitRemoved;
+import org.eclipse.recommenders.rcp.events.JavaModelEvents.CompilationUnitSaved;
+import org.eclipse.recommenders.rcp.events.JavaModelEvents.JarPackageFragmentRootAdded;
+import org.eclipse.recommenders.rcp.events.JavaModelEvents.JarPackageFragmentRootRemoved;
+import org.eclipse.recommenders.rcp.events.JavaModelEvents.JavaProjectClosed;
+import org.eclipse.recommenders.rcp.events.JavaModelEvents.JavaProjectOpened;
 
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
@@ -51,7 +50,7 @@ public class JavaModelEventsProvider implements IElementChangedListener {
     private final EventBus bus;
     private final IWorkspaceRoot workspace;
 
-    //@Inject
+    // @Inject
     public JavaModelEventsProvider(final EventBus bus, final IWorkspaceRoot workspace) {
         this.bus = bus;
         this.workspace = workspace;
@@ -196,11 +195,11 @@ public class JavaModelEventsProvider implements IElementChangedListener {
     }
 
     private void fireJarPackageFragementRootAddedEvent(final IJavaElementDelta delta) {
-        bus.post(new JarPackageFragmentRootAdded((JarPackageFragmentRoot) (delta.getElement())));
+        bus.post(new JarPackageFragmentRootAdded((JarPackageFragmentRoot) delta.getElement()));
     }
 
     private void fireJarPackageFragementRootRemoved(final IJavaElementDelta delta) {
-        bus.post(new JarPackageFragmentRootRemoved((JarPackageFragmentRoot) (delta.getElement())));
+        bus.post(new JarPackageFragmentRootRemoved((JarPackageFragmentRoot) delta.getElement()));
     }
 
     private Set<IProject> getAllOpenProjects() {

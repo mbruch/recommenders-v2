@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.eclipse.recommenders.utils.Constants;
 import org.eclipse.recommenders.utils.Recommendation;
-import org.eclipse.recommenders.utils.RecommendationsProcessor;
 import org.eclipse.recommenders.utils.names.IMethodName;
 import org.eclipse.recommenders.utils.names.ITypeName;
 
@@ -25,7 +24,8 @@ import com.google.common.collect.ImmutableSet;
 public final class NullCallModel implements ICallModel {
 
     public static NullCallModel INSTANCE = new NullCallModel();
-    public static NullCallModel NULL = INSTANCE;
+    // Alias
+    public static NullCallModel NULL_MODEL = INSTANCE;
 
     @Override
     public boolean setObservedPattern(String newPatternName) {
@@ -53,17 +53,7 @@ public final class NullCallModel implements ICallModel {
     }
 
     @Override
-    public boolean setObservedCall(IMethodName additionalCalledMethod) {
-        return false;
-    }
-
-    @Override
     public void reset() {
-    }
-
-    @Override
-    public ITypeName getType() {
-        return Constants.NULL_TYPE;
     }
 
     @Override
@@ -102,17 +92,22 @@ public final class NullCallModel implements ICallModel {
     }
 
     @Override
-    public List<Recommendation<IMethodName>> getRecommendedDefinitions(RecommendationsProcessor<IMethodName> processor) {
+    public List<Recommendation<IMethodName>> getRecommendedDefinitions() {
         return Collections.emptyList();
     }
 
     @Override
-    public List<Recommendation<String>> getRecommendedPatterns(RecommendationsProcessor<String> processor) {
+    public List<Recommendation<String>> getRecommendedPatterns() {
         return Collections.emptyList();
     }
 
     @Override
-    public List<Recommendation<IMethodName>> getRecommendedCalls(RecommendationsProcessor<IMethodName> processor) {
+    public List<Recommendation<IMethodName>> getRecommendedCalls() {
         return Collections.emptyList();
+    }
+
+    @Override
+    public ITypeName getReceiverType() {
+        return Constants.NULL_TYPE;
     }
 }

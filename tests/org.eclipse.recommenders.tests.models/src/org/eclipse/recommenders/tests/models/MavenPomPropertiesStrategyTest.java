@@ -10,8 +10,7 @@
  */
 package org.eclipse.recommenders.tests.models;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.Properties;
@@ -19,7 +18,7 @@ import java.util.Properties;
 import org.eclipse.recommenders.models.ProjectCoordinate;
 import org.eclipse.recommenders.models.dependencies.DependencyInfo;
 import org.eclipse.recommenders.models.dependencies.DependencyType;
-import org.eclipse.recommenders.models.dependencies.IMappingStrategy;
+import org.eclipse.recommenders.models.dependencies.IProjectCoordinateResolver;
 import org.eclipse.recommenders.models.dependencies.impl.MavenPomPropertiesStrategy;
 import org.eclipse.recommenders.models.dependencies.impl.MavenPomPropertiesStrategy.IFileToJarFileConverter;
 import org.eclipse.recommenders.tests.models.utils.IFileToJarFileConverterMockBuilder;
@@ -44,7 +43,7 @@ public class MavenPomPropertiesStrategyTest {
 
     private IFileToJarFileConverter createIFileToJarFileConverter(final String propertiesFileName,
             final Properties properties) {
-        return (new IFileToJarFileConverterMockBuilder()).put(propertiesFileName, properties).build();
+        return new IFileToJarFileConverterMockBuilder().put(propertiesFileName, properties).build();
     }
 
     @Test
@@ -56,7 +55,7 @@ public class MavenPomPropertiesStrategyTest {
 
         DependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
 
-        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
+        IProjectCoordinateResolver sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
         assertEquals(EXPECTED_PROJECT_COORDINATE, optionalProjectCoordinate.get());
@@ -71,7 +70,7 @@ public class MavenPomPropertiesStrategyTest {
 
         DependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
 
-        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
+        IProjectCoordinateResolver sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
         assertFalse(optionalProjectCoordinate.isPresent());
@@ -86,7 +85,7 @@ public class MavenPomPropertiesStrategyTest {
 
         DependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
 
-        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
+        IProjectCoordinateResolver sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
         assertFalse(optionalProjectCoordinate.isPresent());
@@ -101,7 +100,7 @@ public class MavenPomPropertiesStrategyTest {
 
         DependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
 
-        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
+        IProjectCoordinateResolver sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
         assertFalse(optionalProjectCoordinate.isPresent());
@@ -116,7 +115,7 @@ public class MavenPomPropertiesStrategyTest {
 
         DependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
 
-        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
+        IProjectCoordinateResolver sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
         assertFalse(optionalProjectCoordinate.isPresent());
@@ -131,7 +130,7 @@ public class MavenPomPropertiesStrategyTest {
 
         DependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
 
-        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
+        IProjectCoordinateResolver sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
         assertFalse(optionalProjectCoordinate.isPresent());
@@ -147,7 +146,7 @@ public class MavenPomPropertiesStrategyTest {
 
         DependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
 
-        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
+        IProjectCoordinateResolver sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
         assertFalse(optionalProjectCoordinate.isPresent());
@@ -162,7 +161,7 @@ public class MavenPomPropertiesStrategyTest {
 
         DependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
 
-        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
+        IProjectCoordinateResolver sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
         assertFalse(optionalProjectCoordinate.isPresent());
@@ -177,7 +176,7 @@ public class MavenPomPropertiesStrategyTest {
 
         DependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.PROJECT);
 
-        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
+        IProjectCoordinateResolver sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
         assertFalse(optionalProjectCoordinate.isPresent());
@@ -185,11 +184,12 @@ public class MavenPomPropertiesStrategyTest {
 
     @Test
     public void testApplicabaleTypButNoFile() {
-        IFileToJarFileConverter fileToJarFileConverter = IFileToJarFileConverterMockBuilder.createEmptyIFileToJarFileConverter();
+        IFileToJarFileConverter fileToJarFileConverter = IFileToJarFileConverterMockBuilder
+                .createEmptyIFileToJarFileConverter();
 
         DependencyInfo info = new DependencyInfo(new File(""), DependencyType.JAR);
 
-        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
+        IProjectCoordinateResolver sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
         assertFalse(optionalProjectCoordinate.isPresent());
@@ -200,12 +200,12 @@ public class MavenPomPropertiesStrategyTest {
         final String propertiesFileName1 = "META-INF/maven/org.example/example/pom.properties";
         final String propertiesFileName2 = "META-INF/maven/org.example/invalid/pom.properties";
 
-        IFileToJarFileConverter fileToJarFileConverter = (new IFileToJarFileConverterMockBuilder())
+        IFileToJarFileConverter fileToJarFileConverter = new IFileToJarFileConverterMockBuilder()
                 .put(propertiesFileName2, INPUT_PROPERTIES).put(propertiesFileName1, INPUT_PROPERTIES).build();
 
         DependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
 
-        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
+        IProjectCoordinateResolver sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
         assertEquals(EXPECTED_PROJECT_COORDINATE, optionalProjectCoordinate.get());
@@ -216,12 +216,12 @@ public class MavenPomPropertiesStrategyTest {
         final String propertiesFileName1 = "META-INF/maven/org.example/invalid/pom.properties";
         final String propertiesFileName2 = "META-INF/maven/org.example/example/pom.properties";
 
-        IFileToJarFileConverter fileToJarFileConverter = (new IFileToJarFileConverterMockBuilder())
+        IFileToJarFileConverter fileToJarFileConverter = new IFileToJarFileConverterMockBuilder()
                 .put(propertiesFileName1, INPUT_PROPERTIES).put(propertiesFileName2, INPUT_PROPERTIES).build();
 
         DependencyInfo info = new DependencyInfo(JAR_FILE_EXAMPLE, DependencyType.JAR);
 
-        IMappingStrategy sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
+        IProjectCoordinateResolver sut = new MavenPomPropertiesStrategy(fileToJarFileConverter);
         Optional<ProjectCoordinate> optionalProjectCoordinate = sut.searchForProjectCoordinate(info);
 
         assertEquals(EXPECTED_PROJECT_COORDINATE, optionalProjectCoordinate.get());
