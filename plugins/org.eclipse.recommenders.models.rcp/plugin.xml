@@ -9,5 +9,11 @@
             class="org.eclipse.recommenders.models.rcp.wiring.E4Processor">
       </processor>
    </extension>
+   <extension
+         point="org.eclipse.recommenders.injection.modules">
+      <module
+            class="org.eclipse.recommenders.models.rcp.wiring.ModelsModule">
+      </module>
+   </extension>
 
 </plugin>

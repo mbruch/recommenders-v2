@@ -7,14 +7,10 @@
       <view
             name="Dependency Identification"
             icon="icons/depinsp.gif"
-            category="org.eclipse.recommenders.models.rcp.dependencymonitor.view"
-            class="org.eclipse.recommenders.models.rcp.dependencymonitor.views.DependencyMonitor"
+            category="org.eclipse.recommenders.rcp.category.views"
+            class="org.eclipse.recommenders.injection.ExtensionFactory:org.eclipse.recommenders.models.rcp.dependencymonitor.views.DependencyMonitor"
             id="org.eclipse.recommenders.models.rcp.dependencymonitor.views.DependencyMonitor">
       </view>
-      <category
-            id="org.eclipse.recommenders.models.rcp.dependencymonitor.view"
-            name="Code Recommenders">
-      </category>
    </extension>
 
 </plugin>
