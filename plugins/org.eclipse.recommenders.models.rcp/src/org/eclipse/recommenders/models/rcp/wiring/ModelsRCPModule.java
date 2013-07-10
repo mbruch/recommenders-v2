@@ -12,10 +12,6 @@ package org.eclipse.recommenders.models.rcp.wiring;
 
 import javax.inject.Singleton;
 
-import org.eclipse.recommenders.models.dependencies.impl.JREExecutionEnvironmentStrategy;
-import org.eclipse.recommenders.models.dependencies.impl.JREReleaseFileStrategy;
-import org.eclipse.recommenders.models.dependencies.impl.MappingProvider;
-import org.eclipse.recommenders.models.dependencies.impl.MavenPomPropertiesStrategy;
 import org.eclipse.recommenders.models.dependencies.rcp.EclipseDependencyListener;
 
 import com.google.common.eventbus.EventBus;
@@ -23,21 +19,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 
-public class ModelsModule extends AbstractModule implements Module {
+public class ModelsRCPModule extends AbstractModule implements Module {
 
 	@Override
 	protected void configure() {
 		//
-	}
-
-	@Singleton
-	@Provides
-	protected MappingProvider provideMappingProvider() {
-		MappingProvider mappingProvider = new MappingProvider();
-		mappingProvider.addStrategy(new MavenPomPropertiesStrategy());
-		mappingProvider.addStrategy(new JREExecutionEnvironmentStrategy());
-		mappingProvider.addStrategy(new JREReleaseFileStrategy());
-		return mappingProvider;
 	}
 	
 	@Singleton

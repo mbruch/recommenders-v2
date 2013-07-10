@@ -23,7 +23,6 @@ import com.google.common.base.Optional;
 
 public class FingerprintStrategy extends AbstractStrategy {
 
-
     private final SimpleIndexSearcher indexer;
 
     public FingerprintStrategy(SimpleIndexSearcher indexer) {
